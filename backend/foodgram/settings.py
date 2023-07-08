@@ -11,7 +11,22 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='MyTestKey')
 
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
+ALLOWED_HOSTS = []
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,6 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
+AUTH_USER_MODEL = 'users.User'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -114,7 +130,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -125,5 +141,3 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 
 }
-
-AUTH_USER_MODEL = "users.User"
