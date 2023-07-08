@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
     'djoser',
+    'core.apps.CoreConfig',
     'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',
     'users.apps.UsersConfig',
@@ -124,3 +125,5 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 
 }
+
+AUTH_USER_MODEL = "users.User"
