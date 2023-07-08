@@ -13,6 +13,9 @@ class Ingredients(models.Model):
         verbose_name='Единица измерения',
         max_length=10
     )
+    
+    def __str__(self):
+        return f'{self.name}({self.measurement_unit})'
 
 class Tags(models.Model):
     name = models.CharField(
@@ -24,4 +27,60 @@ class Tags(models.Model):
         max_length=16
     )
     slug = models.SlugField(unique=True)
+    
+    def __str__(self):
+        return f'{self.name}({self.slug})'
 
+class Recipes(models.Model):
+    ingredients = models.ManyToManyField(
+        Ingredients,
+        through='IngredientsRecipes'
+    )
+    tags = models.ManyToManyField(
+        Tags,
+        through='TagsRecipes'
+    )
+    image = models.ImageField(
+        upload_to='recipes/images/',
+        null=True,
+        default=None
+    )
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=200
+    )
+    text = models.TextField(
+        verbose_name='Описание',
+    )
+    cooking_time = models.IntegerField(
+        verbose_name='Время приготовления',
+    )
+    
+    def __str__(self):
+        return f'{self.name}'
+
+class IngredientsRecipes(models.Model):
+    ingredients = models.ForeignKey(
+        Ingredients,
+        on_delete=models.CASCADE
+    )
+    recipes = models.ForeignKey(
+        Recipes,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f'{self.recipes} - {self.ingredients}'
+    
+class TagsRecipes(models.Model):
+    tags = models.ForeignKey(
+        Tags,
+        on_delete=models.CASCADE
+    )
+    recipes = models.ForeignKey(
+        Recipes,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f'{self.recipes} - {self.achievement}'
