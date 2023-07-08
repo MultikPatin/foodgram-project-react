@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from recipes.models import (
     Ingredients,
+    Tags,
 )
 
 
@@ -12,4 +13,10 @@ class IngredientsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Ingredients
+        fields = '__all__'
+     
+class TagsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Tags
         fields = '__all__'

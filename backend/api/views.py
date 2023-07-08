@@ -9,9 +9,11 @@ from django.contrib.auth import get_user_model
 
 from recipes.models import (
     Ingredients,
+    Tags,
 )
 from api.serializers import (
-    IngredientsSerializer
+    IngredientsSerializer,
+    TagsSerializer,
 )
 
 
@@ -22,6 +24,11 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientsSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['^name']
+
+class TagsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Tags.objects.all()
+    serializer_class = TagsSerializer
+
 
 
 
