@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 db_model = Ingredients
 model_name = 'Ingredients'
 file_name = 'ingredients.csv'
-filepath = 'data/' + file_name
+filepath = '../data/' + file_name
 
 ALREDY_LOADED_ERROR_MESSAGE = """
 If you need to reload the {} data from the CSV file,
@@ -19,8 +19,6 @@ database with tables""".format(model_name)
 
 
 class Command(BaseCommand):
-
-    help = 'Loads data from {}'.format(file_name)
 
     def handle(self, *args, **options):
 

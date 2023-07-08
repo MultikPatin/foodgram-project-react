@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-
+from rest_framework import filters
 from rest_framework import status, viewsets, mixins
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -17,10 +17,11 @@ from api.serializers import (
 
 
 
-
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredients.objects.all()
     serializer_class = IngredientsSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['^name']
 
 
 
