@@ -13,6 +13,7 @@ from recipes.models import (
     Ingredients,
     Tags,
     Recipes,
+    IngredientsRecipes,
 )
 
 
@@ -28,13 +29,20 @@ class Base64ImageField(serializers.ImageField):
 
 
 class IngredientsSerializer(serializers.ModelSerializer):
-
+    
     class Meta:
         model = Ingredients
         fields = '__all__'
         read_only_fields = ['name', 'measurement_unit']
 
 
+class TagsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Tags
+        fields = '__all__'
+        read_only_fields = ['name', 'color', 'slug']
+        
 class TagsSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -57,6 +65,7 @@ class RecipesSerializer(WritableNestedModelSerializer):
     tags = serializers.SlugRelatedField(
         slug_field='id', 
         queryset=Tags.objects.all(),
-        many=True
+        many=True,
     )
     image = Base64ImageField(required=False, allow_null=True)
+

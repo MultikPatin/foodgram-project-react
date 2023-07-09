@@ -77,6 +77,10 @@ class IngredientsRecipes(models.Model):
         Recipes,
         on_delete=models.CASCADE
     )
+    amount = models.IntegerField(
+        verbose_name='Количество',
+        default=0
+    )
 
     def __str__(self):
         return f'{self.recipes} <-> {self.ingredients}'
