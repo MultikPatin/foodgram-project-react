@@ -9,6 +9,7 @@ class User(AbstractUser):
     last_name = models.CharField('Фамилия', max_length=150)
     
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+    USERNAME_FIELDS = 'email'
     
     def __str__(self):
         return str(self.username)
