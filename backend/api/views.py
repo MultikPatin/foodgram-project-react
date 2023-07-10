@@ -3,7 +3,10 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import filters
 from rest_framework import status, viewsets, mixins
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    SAFE_METHODS
+)
 
 from recipes.models import (
     Ingredients,
@@ -13,7 +16,8 @@ from recipes.models import (
 from api.serializers import (
     IngredientsSerializer,
     TagsSerializer,
-    RecipesSerializer,
+    # RecipesSerializer,
+    RecipeSafeMethodSerializer
 )
 
 
@@ -30,10 +34,14 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 class RecipesViewSet(viewsets.ModelViewSet):
-    queryset = Recipes.objects.all()
-    serializer_class = RecipesSerializer
     
-    def perform_create(self, serializer: RecipesSerializer):
+    queryset = Recipes.objects.all()
+    # serializer_class = RecipesSerializer
+    
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return RecipeSafeMethodSerializer
+        # return RecipesSerializer
+    
+    def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-

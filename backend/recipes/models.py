@@ -97,3 +97,10 @@ class TagsRecipes(models.Model):
 
     def __str__(self):
         return f'{self.recipes} <-> {self.tags}'
+
+class Favorite(models.Model):
+    pass
+
+
+class ShoppingCart(models.Model):
+    pass
