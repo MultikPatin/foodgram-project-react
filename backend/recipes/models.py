@@ -17,6 +17,7 @@ class Ingredients(models.Model):
     def __str__(self):
         return self.name
 
+
 class Tags(models.Model):
     name = models.CharField(
         verbose_name='Название',
@@ -31,6 +32,7 @@ class Tags(models.Model):
     
     def __str__(self):
         return self.name
+
 
 class Recipes(models.Model):
     author = models.ForeignKey(
@@ -68,14 +70,17 @@ class Recipes(models.Model):
     def __str__(self):
         return self.name
 
+
 class IngredientsRecipes(models.Model):
     ingredients = models.ForeignKey(
         Ingredients,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='ingredientsrecipes'
     )
     recipes = models.ForeignKey(
         Recipes,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='ingredientsrecipes'
     )
     amount = models.IntegerField(
         verbose_name='Количество',
@@ -84,7 +89,8 @@ class IngredientsRecipes(models.Model):
 
     def __str__(self):
         return f'{self.recipes} <-> {self.ingredients}'
-    
+
+  
 class TagsRecipes(models.Model):
     tags = models.ForeignKey(
         Tags,
@@ -98,9 +104,47 @@ class TagsRecipes(models.Model):
     def __str__(self):
         return f'{self.recipes} <-> {self.tags}'
 
+
 class Favorite(models.Model):
-    pass
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite'
+    )
+    recipes = models.ForeignKey(
+        Recipes,
+        on_delete=models.CASCADE,
+        related_name='favorite'
+    )
 
 
 class ShoppingCart(models.Model):
-    pass
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shoppingcart'
+    )
+    recipes = models.ForeignKey(
+        Recipes,
+        on_delete=models.CASCADE,
+        related_name='shoppingcart'
+    )
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Автор',
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
