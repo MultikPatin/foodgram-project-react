@@ -30,5 +30,5 @@ router.register("users",
 urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('', include(router.urls)),
-    path('', include('djoser.urls')),    
+    # path('', include('djoser.urls')),    
 ]

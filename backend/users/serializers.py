@@ -10,7 +10,7 @@ from users.models import Follow
 
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):
+class GetUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email',
@@ -20,9 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_name',
                   'is_subscribed'
                   ]
-
     is_subscribed = serializers.SerializerMethodField()
-    
     def get_is_subscribed(self, obj):
         if self.context['request'].user.is_anonymous:
             return False
@@ -30,6 +28,17 @@ class UserSerializer(serializers.ModelSerializer):
             user=self.context['request'].user, 
             author=obj.id
         ).exists()
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email',
+                  'id',
+                  'username',
+                  'first_name',
+                  'last_name',
+                  ]
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
