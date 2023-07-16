@@ -7,6 +7,7 @@ from recipes.views import (
     TagsViewSet,
     IngredientsViewSet
 )
+
 from users.views import (
     CustomUserViewSet  
 )
@@ -25,7 +26,6 @@ router.register("ingredients",
 router.register("users",
                 CustomUserViewSet,
                 basename="recipes")
-
 
 urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
