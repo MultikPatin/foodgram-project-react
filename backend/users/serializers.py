@@ -7,20 +7,25 @@ from rest_framework import serializers
 
 from users.models import Follow
 
+from core.serializers import (
+    USER_FIELDS,
+    CoreUserSerializer,
+)
+
 
 User = get_user_model()
 
-class GetUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['email',
-                  'id',
-                  'username',
-                  'first_name',
-                  'last_name',
-                  'is_subscribed'
-                  ]
+class PostUserSerializer(CoreUserSerializer):
+    class Meta(CoreUserSerializer.Meta):
+        fields = USER_FIELDS
+
+
+class GetUserSerializer(CoreUserSerializer):
+    class Meta(CoreUserSerializer.Meta):
+        fields = USER_FIELDS + ['is_subscribed']
+
     is_subscribed = serializers.SerializerMethodField()
+
     def get_is_subscribed(self, obj):
         if self.context['request'].user.is_anonymous:
             return False
@@ -28,17 +33,15 @@ class GetUserSerializer(serializers.ModelSerializer):
             user=self.context['request'].user, 
             author=obj.id
         ).exists()
+        
 
+class PasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True)
+    current_password = serializers.CharField(required=True)
 
-class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email',
-                  'id',
-                  'username',
-                  'first_name',
-                  'last_name',
-                  ]
+        fields = '__all__'
 
 
 class SubscribeSerializer(serializers.ModelSerializer):

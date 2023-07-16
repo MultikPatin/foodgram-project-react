@@ -1,18 +1,21 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
+from rest_framework.decorators import action
 from rest_framework import status, viewsets, mixins, filters
 from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny,
     SAFE_METHODS
 )
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
 
 from .serializers import (
-    CustomUserSerializer,
+    PostUserSerializer,
     GetUserSerializer,
+    PasswordSerializer,
     SubscribeSerializer
 )
 
@@ -23,13 +26,15 @@ User = get_user_model()
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [
+        AllowAny
+    ]
+    pagination_class = LimitOffsetPagination
     
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return GetUserSerializer
-        return CustomUserSerializer
+        return PostUserSerializer
     
     def perform_create(self, serializer):
         if "password" in self.request.data:
@@ -45,6 +50,32 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         else:
             serializer.save()
 
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=[IsAuthenticated]
+    )
+    def me(self, request, *args, **kwargs):
+        user = get_object_or_404(User, pk=request.user.id)
+        serializer = PostUserSerializer(user)
+        return Response(serializer.data)
+
+    @action(
+        ["post"],
+        detail=False,
+        permission_classes=[IsAuthenticated]
+    )
+    def set_password(self, request, *args, **kwargs):
+        user = self.request.user
+        serializer = PasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user.set_password(serializer.validated_data["new_password"])
+            user.save()
+            return Response()
+        else:
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 
