@@ -1,49 +1,45 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
-from users.models import User
+from core.models import (
+    NameMixinModel,
+    AuthorMixinModel,
+)
 
+User = get_user_model()
 
-class Ingredients(models.Model):
-    name = models.CharField(
-        verbose_name='Название',
-        max_length=200,
-        unique=True
-    )
-    measurement_unit = models.CharField(
-        verbose_name='Единица измерения',
-        max_length=10
-    )
+class Ingredients(NameMixinModel):
     
-    def __str__(self):
-        return self.name
+    class Meta:
+        verbose_name = 'ингредиент'
+        verbose_name_plural = 'ингредиенты'
 
-
-class Tags(models.Model):
-    name = models.CharField(
-        verbose_name='Название',
-        max_length=200,
-        unique=True
+    measurement_unit = models.CharField(
+        'Единица измерения',
+        max_length=10,
+        help_text='Введите единицу измерения'
     )
+
+
+class Tags(NameMixinModel):
+    
+    class Meta:
+        verbose_name = 'тэг'
+        verbose_name_plural = 'теги'
+
     color = models.CharField(
-        verbose_name='Цвет',
-        max_length=16
+        'Цвет',
+        max_length=16,
+        help_text='Введите цвет'
     )
     slug = models.SlugField(unique=True)
-    
-    def __str__(self):
-        return self.name
 
 
-class Recipes(models.Model):
+class Recipes(NameMixinModel):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='recipes'
-    )
-    name = models.CharField(
-        verbose_name='Название',
-        max_length=200,
-        unique=True
     )
     ingredients = models.ManyToManyField(
         Ingredients,
@@ -66,9 +62,6 @@ class Recipes(models.Model):
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления',
     )
-    
-    def __str__(self):
-        return self.name
 
 
 class IngredientsRecipes(models.Model):
@@ -84,13 +77,9 @@ class IngredientsRecipes(models.Model):
     )
     amount = models.IntegerField(
         verbose_name='Количество',
-        default=0
     )
 
-    def __str__(self):
-        return f'{self.recipes} <-> {self.ingredients}'
 
-  
 class TagsRecipes(models.Model):
     tags = models.ForeignKey(
         Tags,
@@ -101,16 +90,13 @@ class TagsRecipes(models.Model):
         on_delete=models.CASCADE
     )
 
-    def __str__(self):
-        return f'{self.recipes} <-> {self.tags}'
+# 
+# 
+# 
+# 
 
+class Favorite(AuthorMixinModel):
 
-class Favorite(models.Model):
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='favorite'
-    )
     recipes = models.ForeignKey(
         Recipes,
         on_delete=models.CASCADE,
@@ -119,11 +105,7 @@ class Favorite(models.Model):
 
 
 class ShoppingCart(models.Model):
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='shoppingcart'
-    )
+
     recipes = models.ForeignKey(
         Recipes,
         on_delete=models.CASCADE,

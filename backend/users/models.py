@@ -4,10 +4,33 @@ from django.db import models
 
 class User(AbstractUser):
 
-    email = models.EmailField(max_length=254, unique=True)
-    username = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
+    class Meta:
+        ordering = ["id"]
+        verbose_name = 'пользователя'
+        verbose_name_plural = 'пользователи'
+
+    email = models.EmailField(
+        max_length=254,
+        unique=True,
+        verbose_name='email',
+        help_text='Введите email'
+    )
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        verbose_name='логин',
+        help_text='Введите логин'
+    )
+    first_name = models.CharField(
+        max_length=150,
+        verbose_name='имя пользователя',
+        help_text='Введите имя'
+    )
+    last_name = models.CharField(
+        max_length=150,
+        verbose_name='фамилия пользователя',
+        help_text='Введите фамилию'
+    )
 
     USERNAME_FIELDS = 'email'
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
@@ -16,16 +39,24 @@ class User(AbstractUser):
         return str(self.username)
 
 class Follow(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="follower"
-    )
+
+    class Meta:
+        ordering = ["user"]
+        verbose_name = 'подписку'
+        verbose_name_plural = 'подписки'
+        unique_together = ("user", "following")
+
     following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="following"
+        related_name="following",
+        verbose_name='автор',
+        help_text='Выберите автора'
     )
-
-    class Meta:
-        unique_together = ("user", "following")
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="follower",
+        verbose_name='подписчик',
+        help_text='Выберите подписчика'
+    )

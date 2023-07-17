@@ -7,11 +7,16 @@ from rest_framework import serializers
 
 from users.models import Follow
 
-from core.serializers import (
-    USER_FIELDS,
-    CoreUserSerializer,
-)
+from core.serializers import CoreUserSerializer
 
+
+USER_FIELDS = [
+    'email',
+    'id',
+    'username',
+    'first_name',
+    'last_name',
+]
 
 User = get_user_model()
 
