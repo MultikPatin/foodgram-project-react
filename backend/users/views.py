@@ -9,14 +9,17 @@ from rest_framework.permissions import (
     AllowAny,
     SAFE_METHODS
 )
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import (
+    # PageNumberPagination,
+    LimitOffsetPagination
+)
 from rest_framework.response import Response
 
 from .serializers import (
     PostUserSerializer,
     GetUserSerializer,
     PasswordSerializer,
-    SubscribeSerializer
+    SubscriptionsSerializer
 )
 
 from .models import Follow
@@ -56,7 +59,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     )
     def me(self, request, *args, **kwargs):
         user = get_object_or_404(User, pk=request.user.id)
-        serializer = PostUserSerializer(user)
+        serializer = GetUserSerializer(user)
         return Response(serializer.data)
 
     @action(
@@ -76,20 +79,22 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-
-
-
-# class SubscribeViewSet(mixins.CreateModelMixin,
-#                        mixins.DestroyModelMixin,
-#                        viewsets.GenericViewSet):
-#     queryset = Follow.objects.all()
-#     serializer_class = SubscribeSerializer
-
-#     def perform_create(self, serializer):
-#         serializer.save(
-#             author=get_object_or_404(
-#                 User,
-#                 id=self.kwargs.get("author_id")
-#             ),
-#             user=self.request.user
-#             )
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=[IsAuthenticated],
+    )
+    def subscriptions(self, request):
+        user = request.user
+        follow = Follow.objects.filter(user=user)
+        user_obj = []
+        for follow_obj in follow:
+            user_obj.append(follow_obj.following)
+        paginator = LimitOffsetPagination()
+        result_page = paginator.paginate_queryset(user_obj, request)
+        serializer = SubscriptionsSerializer(
+            result_page,
+            many=True,
+            # context={"current_user": user}
+        )
+        return paginator.get_paginated_response(serializer.data)

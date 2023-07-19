@@ -9,7 +9,8 @@ from recipes.views import (
 )
 
 from users.views import (
-    CustomUserViewSet  
+    CustomUserViewSet,
+    # SubscriptionsViewSet 
 )
 
 router = DefaultRouter()
@@ -29,6 +30,5 @@ router.register("users",
 
 urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
-    # re_path(r'^users/subscriptions/', include('djoser.urls.authtoken')),
     path('', include(router.urls)),
 ]

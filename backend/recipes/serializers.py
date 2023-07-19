@@ -128,3 +128,13 @@ class RecipesSerializer(RecipesSafeMethodSerializer):
 #     #     test=User.objects.filter(id=obj.author.id
 #     #         ).values()
 #     #     return test
+
+class SpecialRecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipes
+        fields = (
+            "id",
+            "name",
+            "image",
+            "cooking_time",
+        )
