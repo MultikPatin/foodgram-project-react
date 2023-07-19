@@ -38,12 +38,13 @@ class User(AbstractUser):
     def __str__(self):
         return str(self.username)
 
+
 class Follow(models.Model):
 
     class Meta:
         ordering = ["user"]
         verbose_name = 'подписку'
-        verbose_name_plural = 'подписки'
+        verbose_name_plural = 'пользователь -> подписки'
         unique_together = ("user", "following")
 
     following = models.ForeignKey(
@@ -59,4 +60,27 @@ class Follow(models.Model):
         related_name="follower",
         verbose_name='подписчик',
         help_text='Выберите подписчика'
+    )
+
+
+class Favorite(models.Model):
+    
+    class Meta:
+        ordering = ["user"]
+        verbose_name = 'избранное'
+        verbose_name_plural = 'пользователь -> избранное'
+    
+    recipes = models.ForeignKey(
+        to='recipes.Recipes',
+        on_delete=models.CASCADE,
+        related_name='favorite',
+        verbose_name='рецепт',
+        help_text='Выберите рецепт'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite',
+        verbose_name='пользователь',
+        help_text='Выберите пользователя'
     )

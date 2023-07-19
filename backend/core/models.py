@@ -21,24 +21,24 @@ class NameMixinModel(models.Model):
     def __str__(self):
         return self.name
 
-class AuthorMixinModel(models.Model):
+# class AuthorMixinModel(models.Model):
     
-    class Meta:
-        abstract = True
+#     class Meta:
+#         abstract = True
         
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='author'
-    )
+#     author = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name='author'
+#     )
 
 # class RecipesMixinModel(models.Model):
     
 #     class Meta:
 #         abstract = True
         
-#     author = models.ForeignKey(
-#         Recipes,
+#     recipes = models.ForeignKey(
+#         to='recipes.Recipes',
 #         on_delete=models.CASCADE,
 #         related_name='recipes'
 #     )
