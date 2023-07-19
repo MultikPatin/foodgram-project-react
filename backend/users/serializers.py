@@ -13,7 +13,7 @@ from core.serializers import (
     IsSubscribedMixin,
 )
 
-from recipes.serializers import SpecialRecipeSerializer
+from recipes.serializers import CleanRecipeSerializer
 
 
 User = get_user_model()
@@ -37,14 +37,11 @@ class PasswordSerializer(serializers.Serializer):
         fields = '__all__'
 
 
-class SubscriptionsSerializer(IsSubscribedMixin,
-                              serializers.ModelSerializer):
-    recipes = SpecialRecipeSerializer(many=True)
+class SubscriptionsSerializer(IsSubscribedMixin, CoreUserSerializer):
     is_subscribed = serializers.SerializerMethodField()
+    recipes = CleanRecipeSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
-    class Meta:
-        model = User
-        
+    class Meta(CoreUserSerializer.Meta): 
         fields = USER_FIELDS + [
             "is_subscribed",
             "recipes",
@@ -52,5 +49,4 @@ class SubscriptionsSerializer(IsSubscribedMixin,
         ]
 
     def get_recipes_count(self, obj):
-        count = obj.recipes.all().count()
-        return count
+        return obj.recipes.all().count()

@@ -129,7 +129,7 @@ class RecipesSerializer(RecipesSafeMethodSerializer):
 #     #         ).values()
 #     #     return test
 
-class SpecialRecipeSerializer(serializers.ModelSerializer):
+class CleanRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipes
         fields = (

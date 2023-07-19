@@ -3,14 +3,13 @@ from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import action
-from rest_framework import status, viewsets, mixins, filters
+from rest_framework import status, viewsets
 from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny,
     SAFE_METHODS
 )
 from rest_framework.pagination import (
-    # PageNumberPagination,
     LimitOffsetPagination
 )
 from rest_framework.response import Response
@@ -29,8 +28,7 @@ User = get_user_model()
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    permission_classes = [
-        AllowAny]
+    permission_classes = [AllowAny]
     pagination_class = LimitOffsetPagination
     
     def get_serializer_class(self):
