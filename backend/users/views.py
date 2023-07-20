@@ -83,11 +83,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated],
     )
     def subscriptions(self, request):
-        user = request.user
-        follow = Follow.objects.filter(user=user)
-        user_obj = []
-        for follow_obj in follow:
-            user_obj.append(follow_obj.following) 
+        follow = Follow.objects.filter(user=request.user)
+        user_obj = [x.following for x in follow]
         paginator = LimitOffsetPagination()
         result_page = paginator.paginate_queryset(user_obj, request)
         serializer = SubscriptionsSerializer(
@@ -112,11 +109,11 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             'following': following.id,
         }
         if request.method == 'POST':
-            if follow.exists():
-                return Response(
-                    'Вы уже подписаны',
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # if follow.exists():
+            #     return Response(
+            #         'Вы уже подписаны',
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
             serializer = FollowerSerializer(
                 data=data,
                 context=request.query_params

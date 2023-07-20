@@ -8,18 +8,12 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from users.models import Follow
 
-from recipes.models import Recipes
-
 from core.serializers import (
     USER_FIELDS,
     CoreUserSerializer,
     IsSubscribedMixin,
     RecipleInfoMixin
 )
-
-# from recipes.serializers import CleanRecipeSerializer
-
-# from api.paginations import ReciplePagination
 
 
 User = get_user_model()
@@ -56,6 +50,38 @@ class SubscriptionsSerializer(IsSubscribedMixin,
             'recipes_count',
         ]
 
+
+class FollowerSerializer(
+    # IsSubscribedMixin,
+                        #  RecipleInfoMixin,
+                         serializers.ModelSerializer):
+    # is_subscribed = serializers.SerializerMethodField()
+    # recipes = serializers.SerializerMethodField()
+    # recipes_count = serializers.SerializerMethodField()
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all()
+    )
+    # following = GetUserSerializer()
+    following = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all()
+    )
+    class Meta:
+        # fields = USER_FIELDS + [
+        #     'user', 
+        #     'following',
+        #     'is_subscribed',
+        #     'recipes',
+        #     'recipes_count',
+        # ]
+        fields = ('user', 'following')
+        model = Follow
+        # validators = [
+        #     UniqueTogetherValidator(
+        #         queryset=Follow.objects.all(),
+        #         fields=['user', 'following'],
+        #     )
+        # ]
+    
     # def get_recipes_count(self, obj):
     #     return obj.recipes.all().count()
     
@@ -69,54 +95,13 @@ class SubscriptionsSerializer(IsSubscribedMixin,
     #         'image',
     #         'cooking_time',
     #     )[:recipes_limit]
-    #     return resipes
-
-
-class FollowerSerializer(IsSubscribedMixin, serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
-    )
-    following = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
-    )
-    class Meta:
-        fields = USER_FIELDS + [
-            'is_subscribed',
-            'recipes',
-            'recipes_count',
-        ]
-        # fields = ('user', 'following')
-        model = Follow
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=['user', 'following'],
-            )
-        ]
+    #     return resipes 
     
-    def get_recipes_count(self, obj):
-        return obj.recipes.all().count()
-    
-    def get_recipes(self, obj):
-        recipes_limit = int(
-            self.context.get('recipes_limit')
-        )
-        resipes = Recipes.objects.values(
-            'id',
-            'name',
-            'image',
-            'cooking_time',
-        )[:recipes_limit]
-        return resipes 
-    
-    def validate(self, data):
-        user = data.get('user')
-        following = data.get('following')
-        if user == following:
-            raise serializers.ValidationError(
-                'На себя подписаться нельзя'
-            )
-        return data   
+    # def validate(self, data):
+    #     user = data.get('user')
+    #     following = data.get('following')
+    #     if user == following:
+    #         raise serializers.ValidationError(
+    #             'На себя подписаться нельзя'
+    #         )
+    #     return data   
