@@ -18,9 +18,9 @@ from .serializers import (
     PostUserSerializer,
     GetUserSerializer,
     PasswordSerializer,
-    SubscriptionsSerializer
+    SubscriptionsSerializer,
+    FollowerSerializer
 )
-
 from .models import Follow
 
 
@@ -37,21 +37,21 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         return PostUserSerializer
     
     def perform_create(self, serializer):
-        if "password" in self.request.data:
-            password = make_password(self.request.data["password"])
+        if 'password' in self.request.data:
+            password = make_password(self.request.data['password'])
             serializer.save(password=password)
         else:
             serializer.save()
 
     def perform_update(self, serializer):
-        if "password" in self.request.data:
-            password = make_password(self.request.data["password"])
+        if 'password' in self.request.data:
+            password = make_password(self.request.data['password'])
             serializer.save(password=password)
         else:
             serializer.save()
 
     @action(
-        methods=["get"],
+        methods=['get'],
         detail=False,
         permission_classes=[IsAuthenticated]
     )
@@ -61,7 +61,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(
-        ["post"],
+        ['post'],
         detail=False,
         permission_classes=[IsAuthenticated]
     )
@@ -69,7 +69,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         user = self.request.user
         serializer = PasswordSerializer(data=request.data)
         if serializer.is_valid():
-            user.set_password(serializer.validated_data["new_password"])
+            user.set_password(serializer.validated_data['new_password'])
             user.save()
             return Response()
         else:
@@ -78,7 +78,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             )
 
     @action(
-        methods=["get"],
+        methods=['get'],
         detail=False,
         permission_classes=[IsAuthenticated],
     )
@@ -87,12 +87,49 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         follow = Follow.objects.filter(user=user)
         user_obj = []
         for follow_obj in follow:
-            user_obj.append(follow_obj.following)
+            user_obj.append(follow_obj.following) 
         paginator = LimitOffsetPagination()
         result_page = paginator.paginate_queryset(user_obj, request)
         serializer = SubscriptionsSerializer(
             result_page,
             many=True,
-            # context={"current_user": user}
+            context=request.query_params
         )
         return paginator.get_paginated_response(serializer.data)
+
+
+    @action(
+        methods=['delete', 'post'],
+        detail=True,
+        permission_classes=[IsAuthenticated],
+    )
+    def subscribe(self, request, pk=None):
+        user = request.user
+        following = get_object_or_404(User, pk=pk)
+        follow = Follow.objects.filter(user=user, following=following)
+        data = {
+            'user': user.id,
+            'following': following.id,
+        }
+        if request.method == 'POST':
+            if follow.exists():
+                return Response(
+                    'Вы уже подписаны',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer = FollowerSerializer(
+                data=data,
+                context=request.query_params
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        elif request.method == 'DELETE':
+            follow.delete()
+            return Response(
+                'Успешная отписка',
+                status=status.HTTP_204_NO_CONTENT
+            )

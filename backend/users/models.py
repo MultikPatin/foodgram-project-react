@@ -5,7 +5,7 @@ from django.db import models
 class User(AbstractUser):
 
     class Meta:
-        ordering = ["id"]
+        ordering = ['id']
         verbose_name = 'пользователя'
         verbose_name_plural = 'пользователи'
 
@@ -42,22 +42,22 @@ class User(AbstractUser):
 class Follow(models.Model):
 
     class Meta:
-        ordering = ["user"]
+        ordering = ['user']
         verbose_name = 'подписку'
         verbose_name_plural = 'пользователь -> подписки'
-        unique_together = ("user", "following")
+        unique_together = ('user', 'following')
 
     following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="following",
+        related_name='following',
         verbose_name='автор',
         help_text='Выберите автора'
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="follower",
+        related_name='follower',
         verbose_name='подписчик',
         help_text='Выберите подписчика'
     )
@@ -66,7 +66,7 @@ class Follow(models.Model):
 class Favorite(models.Model):
     
     class Meta:
-        ordering = ["user"]
+        ordering = ['user']
         verbose_name = 'избранное'
         verbose_name_plural = 'пользователь -> избранное'
     

@@ -15,18 +15,18 @@ from users.views import (
 
 router = DefaultRouter()
 
-router.register("recipes",
+router.register('recipes',
                 RecipesViewSet,
-                basename="recipes")
-router.register("tags",
+                basename='recipes')
+router.register('tags',
                 TagsViewSet,
-                basename="tags")
-router.register("ingredients",
+                basename='tags')
+router.register('ingredients',
                 IngredientsViewSet,
-                basename="ingredients")
-router.register("users",
+                basename='ingredients')
+router.register('users',
                 CustomUserViewSet,
-                basename="recipes")
+                basename='recipes')
 
 urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),

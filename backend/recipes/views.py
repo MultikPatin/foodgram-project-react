@@ -1,16 +1,13 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import render
-
 from django.shortcuts import get_object_or_404
 
 from rest_framework import filters
-from rest_framework import status, viewsets, mixins
+from rest_framework import status, viewsets
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
     SAFE_METHODS
 )
-from users.models import Follow
-from recipes.models import (
+from .models import (
     Ingredients,
     Tags,
     Recipes
@@ -20,7 +17,6 @@ from .serializers import (
     TagsSerializer,
     RecipesSerializer,
     RecipesSafeMethodSerializer,
-    # SubscribeSerializer,
 )
 
 

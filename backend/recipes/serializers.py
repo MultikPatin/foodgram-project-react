@@ -13,7 +13,6 @@ from recipes.models import (
     Recipes,
     IngredientsRecipes,
     TagsRecipes,
-    # Favorite,
     ShoppingCart,   
 )
 
@@ -129,12 +128,12 @@ class RecipesSerializer(RecipesSafeMethodSerializer):
 #     #         ).values()
 #     #     return test
 
-class CleanRecipeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Recipes
-        fields = (
-            "id",
-            "name",
-            "image",
-            "cooking_time",
-        )
+# class CleanRecipeSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Recipes
+#         fields = (
+#             'id',
+#             'name',
+#             'image',
+#             'cooking_time',
+#         )

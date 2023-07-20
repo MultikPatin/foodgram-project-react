@@ -63,7 +63,7 @@
 #         serializer.save(
 #             author=get_object_or_404(
 #                 User,
-#                 id=self.kwargs.get("author_id")
+#                 id=self.kwargs.get('author_id')
 #             ),
 #             user=self.request.user
 #             )
