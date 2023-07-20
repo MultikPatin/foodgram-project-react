@@ -40,13 +40,25 @@ class RecipleInfoMixin():
         return obj.recipes.all().count()
     
     def get_recipes(self, obj):
-        recipes_limit = int(
-            self.context.get('recipes_limit')
-        )
-        resipes = Recipes.objects.values(
-            'id',
-            'name',
-            'image',
-            'cooking_time',
-        )[:recipes_limit]
-        return resipes
+        recipes_limit = self.context.get('recipes_limit')
+        following = self.context.get('following')
+        if following:
+            recipes = Recipes.objects.filter(
+                author=following
+            ).values(
+                'id',
+                'name',
+                'image',
+                'cooking_time'
+            )
+        else:
+           recipes = Recipes.objects.all(
+               ).values(
+                'id',
+                'name',
+                'image',
+                'cooking_time'
+            )          
+        if recipes_limit:
+            return recipes[:int(recipes_limit)]
+        return recipes

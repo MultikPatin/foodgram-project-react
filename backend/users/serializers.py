@@ -37,7 +37,7 @@ class PasswordSerializer(serializers.Serializer):
         fields = '__all__'
 
 
-class SubscriptionsSerializer(IsSubscribedMixin, 
+class SubscriptionsSerializer(IsSubscribedMixin,
                               RecipleInfoMixin,
                               CoreUserSerializer):
     is_subscribed = serializers.SerializerMethodField()
@@ -51,57 +51,28 @@ class SubscriptionsSerializer(IsSubscribedMixin,
         ]
 
 
-class FollowerSerializer(
-    # IsSubscribedMixin,
-                        #  RecipleInfoMixin,
-                         serializers.ModelSerializer):
-    # is_subscribed = serializers.SerializerMethodField()
-    # recipes = serializers.SerializerMethodField()
-    # recipes_count = serializers.SerializerMethodField()
+class FollowerSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all()
     )
-    # following = GetUserSerializer()
     following = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all()
     )
     class Meta:
-        # fields = USER_FIELDS + [
-        #     'user', 
-        #     'following',
-        #     'is_subscribed',
-        #     'recipes',
-        #     'recipes_count',
-        # ]
         fields = ('user', 'following')
         model = Follow
-        # validators = [
-        #     UniqueTogetherValidator(
-        #         queryset=Follow.objects.all(),
-        #         fields=['user', 'following'],
-        #     )
-        # ]
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=['user', 'following'],
+            )
+        ]
     
-    # def get_recipes_count(self, obj):
-    #     return obj.recipes.all().count()
-    
-    # def get_recipes(self, obj):
-    #     recipes_limit = int(
-    #         self.context.get('recipes_limit')
-    #     )
-    #     resipes = Recipes.objects.values(
-    #         'id',
-    #         'name',
-    #         'image',
-    #         'cooking_time',
-    #     )[:recipes_limit]
-    #     return resipes 
-    
-    # def validate(self, data):
-    #     user = data.get('user')
-    #     following = data.get('following')
-    #     if user == following:
-    #         raise serializers.ValidationError(
-    #             'На себя подписаться нельзя'
-    #         )
-    #     return data   
+    def validate(self, data):
+        user = data.get('user')
+        following = data.get('following')
+        if user == following:
+            raise serializers.ValidationError(
+                'На себя подписаться нельзя'
+            )
+        return data   

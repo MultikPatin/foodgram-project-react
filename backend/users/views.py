@@ -13,6 +13,7 @@ from rest_framework.pagination import (
     LimitOffsetPagination
 )
 from rest_framework.response import Response
+from rest_framework.request import Request
 
 from .serializers import (
     PostUserSerializer,
@@ -100,7 +101,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         detail=True,
         permission_classes=[IsAuthenticated],
     )
-    def subscribe(self, request, pk=None):
+    def subscribe(self, request: Request, pk=None):
+        recipes_limit = request.query_params.get('recipes_limit')
         user = request.user
         following = get_object_or_404(User, pk=pk)
         follow = Follow.objects.filter(user=user, following=following)
@@ -109,21 +111,28 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             'following': following.id,
         }
         if request.method == 'POST':
-            # if follow.exists():
-            #     return Response(
-            #         'Вы уже подписаны',
-            #         status=status.HTTP_400_BAD_REQUEST
-            #     )
+            if follow.exists():
+                return Response(
+                    'Вы уже подписаны',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             serializer = FollowerSerializer(
                 data=data,
                 context=request.query_params
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
+            result_page = SubscriptionsSerializer(
+                following,
+                context={
+                    'recipes_limit': recipes_limit,
+                    'following': following
+                }
             )
+            return Response(
+                result_page.data,
+                status=status.HTTP_201_CREATED
+            )  
         elif request.method == 'DELETE':
             follow.delete()
             return Response(
