@@ -13,6 +13,7 @@ from recipes.models import (
     Recipes,
     IngredientsRecipes,
     TagsRecipes,
+    Favorite,
     ShoppingCart,   
 )
 

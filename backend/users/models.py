@@ -62,25 +62,5 @@ class Follow(models.Model):
         help_text='Выберите подписчика'
     )
 
-
-# class Favorite(models.Model):
-    
-#     class Meta:
-#         ordering = ['user']
-#         verbose_name = 'избранное'
-#         verbose_name_plural = 'пользователь -> избранное'
-    
-#     recipes = models.ForeignKey(
-#         to='recipes.Recipes',
-#         on_delete=models.CASCADE,
-#         related_name='favorite',
-#         verbose_name='рецепт',
-#         help_text='Выберите рецепт'
-#     )
-#     user = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE,
-#         related_name='favorite',
-#         verbose_name='пользователь',
-#         help_text='Выберите пользователя'
-#     )
+    def __str__(self):
+        return f'{self.user.username} -> {self.following.username}'

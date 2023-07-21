@@ -130,7 +130,7 @@ class Favorite(models.Model):
     class Meta:
         ordering = ['user']
         verbose_name = 'избранное'
-        verbose_name_plural = 'пользователь -> избранное'
+        verbose_name_plural = 'рецепты -> избранное'
     
     recipes = models.ForeignKey(
         to='recipes.Recipes',
