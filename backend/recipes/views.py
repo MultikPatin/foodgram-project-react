@@ -6,7 +6,6 @@ from rest_framework import filters
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
-from rest_framework.views import APIView
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
@@ -18,7 +17,8 @@ from .models import (
     Tags,
     Recipes,
     Favorite,
-    ShoppingCart
+    ShoppingCart,
+    IngredientsRecipes,  
 )
 from .serializers import (
     IngredientSerializer,
@@ -78,4 +78,40 @@ class ShoppingCartViewSet(UserRecipesViewSet):
 
 @api_view(['GET'])
 def download_shopping_cart(request):
-    pass
+    user = request.user
+    shopping_cart = ShoppingCart.objects.filter(
+        user=user
+    )
+
+    buying_list = {}
+    for record in shopping_cart:
+        recipe = record.recipes
+        ingredients = IngredientsRecipes.objects.filter(
+            recipes=recipe
+        )
+        for ingredient in ingredients:
+            amount = ingredient.amount
+            name = ingredient.ingredients.name
+            measurement_unit = ingredient.ingredients.measurement_unit
+            if name not in buying_list:
+                buying_list[name] = {
+                    'measurement_unit': measurement_unit,
+                    'amount': amount,
+                }
+            else:
+                buying_list[name]['amount'] = (
+                    buying_list[name]['amount'] + amount
+                )
+
+    shopping_list = []
+    for name, data in buying_list.items():
+        amount = data['amount']
+        measurement_unit = data['measurement_unit']
+        shopping_list.append(
+            f'{name} - {amount} {measurement_unit}'
+        )
+    print(shopping_list)
+    return Response(
+            shopping_list,
+            status=status.HTTP_201_CREATED
+        )
