@@ -62,3 +62,14 @@ class RecipleInfoMixin():
         if recipes_limit:
             return recipes[:int(recipes_limit)]
         return recipes
+
+
+class UserRecipesSerializer(serializers.ModelSerializer):
+    recipes = serializers.PrimaryKeyRelatedField(
+        queryset=Recipes.objects.all()
+    )
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all()
+    )
+    class Meta:
+        fields = '__all__'

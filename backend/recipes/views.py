@@ -1,31 +1,43 @@
+from typing import Any
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from rest_framework import filters
 from rest_framework import status, viewsets
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, action
 from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
     IsAuthenticatedOrReadOnly,
     SAFE_METHODS
 )
 from .models import (
     Ingredients,
     Tags,
-    Recipes
+    Recipes,
+    Favorite,
+    ShoppingCart,
+    IngredientsRecipes,  
 )
 from .serializers import (
-    IngredientsSerializer,
+    IngredientSerializer,
     TagsSerializer,
     RecipesSerializer,
     RecipesSafeMethodSerializer,
+    FavoriteSerializer,
+    ShoppingCartSerializer
 )
+from core.views import UserRecipesViewSet
 
 
 User = get_user_model()
 
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredients.objects.all()
-    serializer_class = IngredientsSerializer
+    serializer_class = IngredientSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = None
     filter_backends = [filters.SearchFilter]
     search_fields = ['^name']
 
@@ -34,10 +46,12 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tags.objects.all()
     serializer_class = TagsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = None
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
     
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -48,4 +62,56 @@ class RecipesViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
+class FavoriteView(UserRecipesViewSet):
+    query_set = Favorite.objects.all()
+    serializer = FavoriteSerializer
+    message = 'избранное'
+    message_plural = 'избранном'
 
+
+class ShoppingCartViewSet(UserRecipesViewSet):
+    query_set = ShoppingCart.objects.all()
+    serializer = ShoppingCartSerializer
+    message = 'список покупок'
+    message_plural = 'списке покупок'
+
+
+@api_view(['GET'])
+def download_shopping_cart(request):
+    user = request.user
+    shopping_cart = ShoppingCart.objects.filter(
+        user=user
+    )
+
+    buying_list = {}
+    for record in shopping_cart:
+        recipe = record.recipes
+        ingredients = IngredientsRecipes.objects.filter(
+            recipes=recipe
+        )
+        for ingredient in ingredients:
+            amount = ingredient.amount
+            name = ingredient.ingredients.name
+            measurement_unit = ingredient.ingredients.measurement_unit
+            if name not in buying_list:
+                buying_list[name] = {
+                    'measurement_unit': measurement_unit,
+                    'amount': amount,
+                }
+            else:
+                buying_list[name]['amount'] = (
+                    buying_list[name]['amount'] + amount
+                )
+
+    shopping_list = []
+    for name, data in buying_list.items():
+        amount = data['amount']
+        measurement_unit = data['measurement_unit']
+        shopping_list.append(
+            f'{name} - {amount} {measurement_unit}'
+        )
+    print(shopping_list)
+    return Response(
+            shopping_list,
+            status=status.HTTP_201_CREATED
+        )

@@ -4,7 +4,7 @@ from .models import (
     Ingredients,
     Tags,
     Recipes,
-    # Favorite,
+    Favorite,
     ShoppingCart,
     IngredientsRecipes,
     TagsRecipes
@@ -83,3 +83,22 @@ class TagsRecipesAdmin(admin.ModelAdmin):
     )
     search_fields = ('recipes',)
     empty_value_display = '-пусто-'
+
+
+class ListAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'recipes',
+    )
+    search_fields = ('user',)
+    empty_value_display = '-пусто-'
+
+@admin.register(Favorite)
+class FavoriteAdmin(ListAdmin):
+    pass
+
+
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(ListAdmin):
+    pass

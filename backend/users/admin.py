@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
-from .models import Follow, Favorite
+from .models import Follow
 
 
 User = get_user_model()
@@ -35,12 +35,3 @@ class FollowAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-@admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'user',
-        'recipes',
-    )
-    search_fields = ('user',)
-    empty_value_display = '-пусто-'
