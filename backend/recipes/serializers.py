@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from drf_extra_fields.fields import Base64ImageField
+# from drf_extra_fields.fields import Base64ImageField
 
 from recipes.models import (
     Ingredients,
@@ -18,7 +18,14 @@ from recipes.models import (
 )
 from users.serializers import GetUserSerializer
 
-from core.serializers import UserRecipesSerializer
+from core.serializers import (
+    CoreRecipeSerializer,
+    UserRecipesSerializer
+)
+
+from core.serializers import (
+    IsFavoriteOrShopingCardMixin
+)
 
 
 User = get_user_model()
@@ -46,15 +53,11 @@ class TagsSerializer(serializers.ModelSerializer):
         read_only_fields = ['name', 'color', 'slug']
         
 
-class RecipesSafeMethodSerializer(serializers.ModelSerializer):
+class RecipesSafeMethodSerializer(IsFavoriteOrShopingCardMixin):
     author = GetUserSerializer()
     tags = TagsSerializer(many=True)
     ingredients = IngredientSerializer(many=True)
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
-    image = Base64ImageField(required=False, allow_null=True)
-    class Meta:
-        model = Recipes
+    class Meta(CoreRecipeSerializer.Meta):
         fields = '__all__'
     
     def get_ingredients(self, obj):
@@ -63,35 +66,15 @@ class RecipesSafeMethodSerializer(serializers.ModelSerializer):
         ).values()
         return ingredients
 
-    def get_is_favorited(self, obj):
-        if self.context['request'].user.is_anonymous:
-            return False
-        return Favorite.objects.filter(
-            author=self.context['request'].user, 
-            recipes=obj.id
-        ).exists()
 
-    def get_is_in_shopping_cart(self, obj):
-        if self.context['request'].user.is_anonymous:
-            return False
-        return ShoppingCart.objects.filter(
-            author=self.context['request'].user, 
-            recipes=obj.id
-        ).exists()
-
-
-class RecipesSerializer(serializers.ModelSerializer):
+class RecipesSerializer(IsFavoriteOrShopingCardMixin):
     ingredients = IngredientsRecipesSerializer(many=True)
     tags = serializers.SlugRelatedField(
         many=True,
         queryset=Tags.objects.all(),
         slug_field='id'
     )
-    image = Base64ImageField(required=False, allow_null=True)
-    is_favorited = None
-    is_in_shopping_cart = None
-    class Meta:
-        model = Recipes
+    class Meta(CoreRecipeSerializer.Meta):
         fields = [
             'ingredients',
             'tags',
@@ -134,13 +117,6 @@ class RecipesSerializer(serializers.ModelSerializer):
         return RecipesSafeMethodSerializer(
             instance, context={'request': self.context.get('request')}
         ).data
-        
-    def get_is_in_shopping_cart(self, obj):
-        if self.context['request'].user.is_anonymous:
-            return False
-        return ShoppingCart.objects.filter(
-            user=self.context['request'].user, recipe=obj
-        ).exists
 
 
 class FavoriteSerializer(UserRecipesSerializer):

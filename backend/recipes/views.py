@@ -1,16 +1,13 @@
-from typing import Any
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from rest_framework import filters
 from rest_framework import status, viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import api_view
 from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
+    SAFE_METHODS,
     IsAuthenticatedOrReadOnly,
-    SAFE_METHODS
 )
 from .models import (
     Ingredients,
@@ -29,6 +26,8 @@ from .serializers import (
     ShoppingCartSerializer
 )
 from core.views import UserRecipesViewSet
+
+from api.permissions import AuthorOrReadOnly
 
 
 User = get_user_model()
@@ -51,7 +50,7 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AuthorOrReadOnly]
     
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:

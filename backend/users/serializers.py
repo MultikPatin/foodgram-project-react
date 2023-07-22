@@ -1,6 +1,3 @@
-from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
@@ -9,7 +6,6 @@ from rest_framework.validators import UniqueTogetherValidator
 from users.models import Follow
 
 from core.serializers import (
-    USER_FIELDS,
     CoreUserSerializer,
     IsSubscribedMixin,
     RecipleInfoMixin
@@ -18,29 +14,33 @@ from core.serializers import (
 
 User = get_user_model()
 
+USER_FIELDS = [
+    'email',
+    'id',
+    'username',
+    'first_name',
+    'last_name',
+]
+
 class PostUserSerializer(CoreUserSerializer):
     class Meta(CoreUserSerializer.Meta):
         fields = USER_FIELDS
 
 
-class GetUserSerializer(IsSubscribedMixin, CoreUserSerializer):
-    is_subscribed = serializers.SerializerMethodField()
+class GetUserSerializer(IsSubscribedMixin):
     class Meta(CoreUserSerializer.Meta):
         fields = USER_FIELDS + ['is_subscribed']
 
 
-class PasswordSerializer(serializers.Serializer):
+class PasswordSerializer(CoreUserSerializer):
     new_password = serializers.CharField(required=True)
     current_password = serializers.CharField(required=True)
     class Meta:
-        model = User
         fields = '__all__'
 
 
 class SubscriptionsSerializer(IsSubscribedMixin,
-                              RecipleInfoMixin,
-                              CoreUserSerializer):
-    is_subscribed = serializers.SerializerMethodField()
+                              RecipleInfoMixin,):
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
     class Meta(CoreUserSerializer.Meta): 
@@ -59,8 +59,8 @@ class FollowerSerializer(serializers.ModelSerializer):
         queryset=User.objects.all()
     )
     class Meta:
-        fields = ('user', 'following')
         model = Follow
+        fields = ('user', 'following')
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
