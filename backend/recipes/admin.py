@@ -10,6 +10,7 @@ from .models import (
     TagsRecipes
 )
 
+
 @admin.register(Recipes)
 class RecipesAdmin(admin.ModelAdmin):
     list_display = (

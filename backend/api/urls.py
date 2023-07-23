@@ -11,9 +11,7 @@ from recipes.views import (
     download_shopping_cart
 )
 
-from users.views import (
-    CustomUserViewSet,
-)
+from users.views import CustomUserViewSet
 
 router = DefaultRouter()
 router.register('recipes',
