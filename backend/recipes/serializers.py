@@ -1,11 +1,6 @@
-from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
-
-# from drf_extra_fields.fields import Base64ImageField
 
 from recipes.models import (
     Ingredients,
@@ -16,6 +11,7 @@ from recipes.models import (
     Favorite,
     ShoppingCart,   
 )
+
 from users.serializers import GetUserSerializer
 
 from core.serializers import (
