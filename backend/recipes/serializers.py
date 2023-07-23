@@ -35,15 +35,31 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredients
         fields = '__all__'
         read_only_fields = ['name', 'measurement_unit']
+        
+
+class IngredientInRecipeSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(
+        source='ingredients.id',
+    )
+    name = serializers.CharField(
+        source='ingredients.name',
+    )
+    measurement_unit = serializers.CharField(
+        source='ingredients.measurement_unit',
+    )
+
+    class Meta:
+        model = IngredientsRecipes
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class IngredientsRecipesSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredients.objects.all(),
+        queryset=Ingredients.objects.all()
     )
     class Meta:
         model = IngredientsRecipes
-        fields = ('id', 'amount')
+        fields = ('id', 'amount',)
 
 
 class TagsSerializer(serializers.ModelSerializer):  
@@ -54,68 +70,76 @@ class TagsSerializer(serializers.ModelSerializer):
         
 
 class RecipesSafeMethodSerializer(IsFavoriteOrShopingCardMixin):
-    author = GetUserSerializer()
+    author = GetUserSerializer(read_only=True)
     tags = TagsSerializer(many=True)
-    ingredients = IngredientSerializer(many=True)
+    ingredients = serializers.SerializerMethodField()
     class Meta(CoreRecipeSerializer.Meta):
         fields = '__all__'
     
     def get_ingredients(self, obj):
-        ingredients = IngredientsRecipes.objects.filter(
-            recipes=obj.id
-        ).values()
-        return ingredients
+        ingredients = IngredientsRecipes.objects.filter(recipes=obj)
+        return IngredientInRecipeSerializer(
+            ingredients,
+            many=True
+        ).data
 
 
 class RecipesSerializer(IsFavoriteOrShopingCardMixin):
+    author = GetUserSerializer(read_only=True)
     ingredients = IngredientsRecipesSerializer(many=True)
     tags = serializers.SlugRelatedField(
         many=True,
         queryset=Tags.objects.all(),
         slug_field='id'
     )
+    cooking_time = serializers.IntegerField()
     class Meta(CoreRecipeSerializer.Meta):
         fields = [
-            'ingredients',
+            'id',
             'tags',
+            'author',
+            'ingredients',
+            'name',
             'image',
             'text',
-            'name',
-            'cooking_time'
+            'cooking_time',
         ]
 
     def validate_cooking_time(self, data):
         if data <= 0:
-            raise serializers.ValidationError("Введите число больше 0")
+            raise serializers.ValidationError('Введите число больше 0')
         return data
 
     def create(self, validated_data):
-        tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        recipe = Recipes.objects.create(**validated_data)
-        recipe.tags.set(tags)
-        for item in ingredients:
-            ingredients = Ingredients.objects.filter(
-                    name=item['id']
-                )
-            amount = item['amount']
+        tags = validated_data.pop('tags')
+        author = self.context.get('request').user
+        recipe = Recipes.objects.create(
+            author=author,
+            **validated_data
+        )
+        for ingredient in ingredients:
+            ingredient_model = ingredient['id']
+            amount = ingredient['amount']
             IngredientsRecipes.objects.create(
-                ingredients=ingredients,
+                ingredients=ingredient_model,
                 recipes=recipe,
                 amount=amount
             )
+        recipe.tags.set(tags)
         return recipe
 
-    def update(self, instance, validated_data):
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
-        instance.tags.clear()
-        return super().update(instance, validated_data)
+    # def update(self, instance, validated_data):
+    #     tags = validated_data.pop('tags')
+    #     ingredients = validated_data.pop('ingredients')
+    #     instance.tags.clear()
+    #     return super().update(instance, validated_data)
 
     def to_representation(self, instance):
-        print(instance.name)
         return RecipesSafeMethodSerializer(
-            instance, context={'request': self.context.get('request')}
+            instance,
+            context={
+                'request': self.context.get('request')}
         ).data
 
 

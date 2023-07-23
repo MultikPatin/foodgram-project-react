@@ -57,8 +57,17 @@ class RecipesViewSet(viewsets.ModelViewSet):
             return RecipesSafeMethodSerializer
         return RecipesSerializer
     
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
+    
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
+        return Response(
+            'Рецепт успешно удален',
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 
 class FavoriteView(UserRecipesViewSet):

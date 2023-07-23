@@ -42,11 +42,12 @@ class CoreRecipeSerializer(serializers.ModelSerializer):
 class IsFavoriteOrShopingCardMixin(CoreRecipeSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    
     def get_is_favorited(self, obj):
         if self.context['request'].user.is_anonymous:
             return False
         return Favorite.objects.filter(
-            author=self.context['request'].user, 
+            user=self.context['request'].user, 
             recipes=obj.id
         ).exists()
 
@@ -54,7 +55,7 @@ class IsFavoriteOrShopingCardMixin(CoreRecipeSerializer):
         if self.context['request'].user.is_anonymous:
             return False
         return ShoppingCart.objects.filter(
-            author=self.context['request'].user, 
+            user=self.context['request'].user, 
             recipes=obj.id
         ).exists()
     

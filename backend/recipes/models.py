@@ -34,7 +34,7 @@ class Tags(NameMixinModel):
 
 class Recipes(NameMixinModel):
     author = models.ForeignKey(
-        User,
+        get_user_model(),
         on_delete=models.CASCADE,
         related_name='recipes',
         verbose_name='автор',
