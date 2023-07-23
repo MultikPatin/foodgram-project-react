@@ -129,11 +129,27 @@ class RecipesSerializer(IsFavoriteOrShopingCardMixin):
         recipe.tags.set(tags)
         return recipe
 
-    # def update(self, instance, validated_data):
-    #     tags = validated_data.pop('tags')
-    #     ingredients = validated_data.pop('ingredients')
-    #     instance.tags.clear()
-    #     return super().update(instance, validated_data)
+    def update(self, instance, validated_data):
+        ingredients_data = validated_data.pop("ingredients")
+        tags_data = validated_data.pop("tags")
+        TagsRecipes.objects.filter(recipes=instance).delete()
+        IngredientsRecipes.objects.filter(recipes=instance).delete()
+        for ingredient in ingredients_data:
+            ingredient_model = ingredient["id"]
+            amount = ingredient["amount"]
+            IngredientsRecipes.objects.create(
+                ingredients=ingredient_model,
+                recipes=instance,
+                amount=amount
+            )
+        instance.name = validated_data.pop("name")
+        instance.text = validated_data.pop("text")
+        if validated_data.get("image") is not None:
+            instance.image = validated_data.pop("image")
+        instance.cooking_time = validated_data.pop("cooking_time")
+        instance.tags.set(tags_data)
+        instance.save()
+        return instance
 
     def to_representation(self, instance):
         return RecipesSafeMethodSerializer(
