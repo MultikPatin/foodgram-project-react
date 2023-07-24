@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 
 from rest_framework import filters
 from rest_framework import status, viewsets
@@ -71,14 +70,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
 
 class FavoriteView(UserRecipesViewSet):
-    query_set = Favorite.objects.all()
+    queryset = Favorite.objects.all()
     serializer = FavoriteSerializer
     message = 'избранное'
     message_plural = 'избранном'
 
 
 class ShoppingCartViewSet(UserRecipesViewSet):
-    query_set = ShoppingCart.objects.all()
+    queryset = ShoppingCart.objects.all()
     serializer = ShoppingCartSerializer
     message = 'список покупок'
     message_plural = 'списке покупок'

@@ -18,7 +18,6 @@ from core.serializers import (
     CoreRecipeSerializer,
     UserRecipesSerializer
 )
-
 from core.serializers import (
     IsFavoriteOrShopingCardMixin
 )
@@ -46,7 +45,12 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientsRecipes
-        fields = ('id', 'name', 'measurement_unit', 'amount')
+        fields = (
+            'id',
+            'name',
+            'measurement_unit',
+            'amount'
+        )
 
 
 class IngredientsRecipesSerializer(serializers.ModelSerializer):
@@ -115,10 +119,10 @@ class RecipesSerializer(IsFavoriteOrShopingCardMixin):
             **validated_data
         )
         for ingredient in ingredients:
-            ingredient_model = ingredient['id']
+            ingredient_id = ingredient['id']
             amount = ingredient['amount']
             IngredientsRecipes.objects.create(
-                ingredients=ingredient_model,
+                ingredients=ingredient_id,
                 recipes=recipe,
                 amount=amount
             )
@@ -128,13 +132,17 @@ class RecipesSerializer(IsFavoriteOrShopingCardMixin):
     def update(self, instance, validated_data):
         ingredients_data = validated_data.pop("ingredients")
         tags_data = validated_data.pop("tags")
-        TagsRecipes.objects.filter(recipes=instance).delete()
-        IngredientsRecipes.objects.filter(recipes=instance).delete()
+        TagsRecipes.objects.filter(
+            recipes=instance
+        ).delete()
+        IngredientsRecipes.objects.filter(
+            recipes=instance
+        ).delete()
         for ingredient in ingredients_data:
-            ingredient_model = ingredient["id"]
+            ingredient_id = ingredient["id"]
             amount = ingredient["amount"]
             IngredientsRecipes.objects.create(
-                ingredients=ingredient_model,
+                ingredients=ingredient_id,
                 recipes=instance,
                 amount=amount
             )

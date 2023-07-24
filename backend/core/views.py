@@ -12,7 +12,7 @@ from recipes.models import Recipes
 User = get_user_model()
 
 class UserRecipesViewSet(APIView):
-    query_set = None
+    queryset = None
     serializer = None
     message = ''
     message_plural = ''
@@ -23,7 +23,7 @@ class UserRecipesViewSet(APIView):
     )
     def post(self, request, recipe_id):
         user_id = request.user.id
-        if self.query_set.filter(
+        if self.queryset.filter(
             user=user_id,
             recipes=recipe_id
         ).exists():
@@ -57,17 +57,19 @@ class UserRecipesViewSet(APIView):
     )
     def delete(self, request, recipe_id):
         user_id = request.user.id
-        recipe = get_object_or_404(Recipes, id=recipe_id)
-        if not self.query_set.filter(
+        recipe = get_object_or_404(Recipes, pk=recipe_id)
+        if not self.queryset.filter(
             user=user_id,
             recipes=recipe
         ).exists():
             return Response(
                 {'Ошибка': f'Рецепта нет в {self.message_plural}'},
                 status=status.HTTP_400_BAD_REQUEST)
-        self.query_set.get(
+        self.queryset.get(
             user=user_id,
-            recipes=recipe).delete()
+            recipes=recipe
+        ).delete()
         return Response(
             {'Ошибка': 'Рецепт успешно удален'},
-            status=status.HTTP_204_NO_CONTENT)
+            status=status.HTTP_204_NO_CONTENT
+        )
