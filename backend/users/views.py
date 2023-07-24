@@ -89,15 +89,22 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         detail=False,
         permission_classes=[IsAuthenticated],
     )
-    def subscriptions(self, request):
+    def subscriptions(self, request: Request):
+        recipes_limit = request.query_params.get('recipes_limit')
         follow = Follow.objects.filter(user=request.user)
-        user_obj = [x.following for x in follow]
+        following_list = [x.following for x in follow]
         paginator = LimitOffsetPagination()
-        result_page = paginator.paginate_queryset(user_obj, request)
+        result_page = paginator.paginate_queryset(
+            following_list,
+            request
+        )
         serializer = SubscriptionsSerializer(
             result_page,
             many=True,
-            context=request.query_params
+            context={
+                'request': request,
+                'recipes_limit': recipes_limit
+            }
         )
         return paginator.get_paginated_response(serializer.data)
 
@@ -109,11 +116,13 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     )
     def subscribe(self, request: Request, pk=None):
         recipes_limit = request.query_params.get('recipes_limit')
-        user = request.user
         following = get_object_or_404(User, pk=pk)
-        follow = Follow.objects.filter(user=user, following=following)
+        follow = Follow.objects.filter(
+            user=request.user, 
+            following=get_object_or_404(User, pk=pk)
+        )
         data = {
-            'user': user.id,
+            'user': request.user.id,
             'following': following.id,
         }
         if request.method == 'POST':
@@ -131,8 +140,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             result_page = SubscriptionsSerializer(
                 following,
                 context={
-                    'recipes_limit': recipes_limit,
-                    'following': following
+                    'request': request,
+                    'recipes_limit': recipes_limit
                 }
             )
             return Response(
