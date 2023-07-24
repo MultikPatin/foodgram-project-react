@@ -8,9 +8,8 @@ from users.models import Follow
 from core.serializers import (
     CoreUserSerializer,
     IsSubscribedMixin,
-    RecipleInfoMixin
 )
-
+from recipes.models import Recipes
 
 User = get_user_model()
 
@@ -21,6 +20,13 @@ USER_FIELDS = [
     'first_name',
     'last_name',
 ]
+RECIPE_FIELDS = [
+    'id',
+    'name',
+    'image',
+    'cooking_time'
+]
+
 
 class PostUserSerializer(CoreUserSerializer):
     class Meta(CoreUserSerializer.Meta):
@@ -39,8 +45,7 @@ class PasswordSerializer(CoreUserSerializer):
         fields = '__all__'
 
 
-class SubscriptionsSerializer(IsSubscribedMixin,
-                              RecipleInfoMixin,):
+class SubscriptionsSerializer(IsSubscribedMixin):
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
     class Meta(CoreUserSerializer.Meta): 
@@ -50,6 +55,22 @@ class SubscriptionsSerializer(IsSubscribedMixin,
             'recipes_count',
         ]
 
+    def get_recipes_count(self, obj):
+        return obj.recipes.all().count()
+    
+    def get_recipes(self, obj):
+        recipes_limit = self.context.get('recipes_limit')
+        following = self.context.get('following')
+        if following:
+            recipes = Recipes.objects.filter(
+                author=following
+            ).values(*RECIPE_FIELDS)
+        else:
+           recipes = Recipes.objects.all(
+               ).values(*RECIPE_FIELDS)          
+        if recipes_limit:
+            return recipes[:int(recipes_limit)]
+        return recipes
 
 class FollowerSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(

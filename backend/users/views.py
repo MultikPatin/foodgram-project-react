@@ -59,7 +59,9 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     def me(self, request, *args, **kwargs):
         user = get_object_or_404(User, pk=request.user.id)
         serializer = GetUserSerializer(user)
-        return Response(serializer.data)
+        return Response(
+            serializer.data
+        )
 
     @action(
         ['post'],
@@ -72,10 +74,14 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             user.set_password(serializer.validated_data['new_password'])
             user.save()
-            return Response()
+            return Response(
+                'Пароль успешно изменен',
+                status=status.HTTP_400_BAD_REQUEST
+            )
         else:
             return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
             )
 
     @action(
