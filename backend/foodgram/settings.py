@@ -75,6 +75,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
+DJOSER = {
+    "HIDE_USERS": False,
+    "LOGIN_FIELD": "email",
+}
+
 AUTH_USER_MODEL = 'users.User'
 
 # Database
@@ -123,7 +128,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'collected_static'
+STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

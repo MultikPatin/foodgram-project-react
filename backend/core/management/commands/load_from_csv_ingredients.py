@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 db_model = Ingredients
 model_name = 'Ingredients'
 file_name = 'ingredients.csv'
-filepath = '../data/' + file_name
+filepath = './data test/' + file_name
 
 ALREDY_LOADED_ERROR_MESSAGE = """
 If you need to reload the {} data from the CSV file,

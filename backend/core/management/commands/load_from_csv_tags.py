@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 db_model = Tags
 model_name = 'tags'
 file_name = 'tags.csv'
-filepath = '../data/' + file_name
+filepath = './data test/' + file_name
 
 ALREDY_LOADED_ERROR_MESSAGE = """
 If you need to reload the {} data from the CSV file,

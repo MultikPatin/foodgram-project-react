@@ -1,5 +1,11 @@
-python3 manage.py migrate --no-input
+#!/bin/bash
 
-python3 manage.py collectstatic --no-input
+python manage.py migrate --no-input
 
-gunicorn backend.wsgi:application --bind 0.0.0.0:8000
+python manage.py collectstatic --no-input
+
+python manage.py load_from_csv_ingredients
+
+python manage.py load_from_csv_tags
+
+gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000
