@@ -41,8 +41,8 @@ class GetUserSerializer(IsSubscribedMixin):
 class PasswordSerializer(CoreUserSerializer):
     new_password = serializers.CharField(required=True)
     current_password = serializers.CharField(required=True)
-    class Meta:
-        fields = '__all__'
+    class Meta(CoreUserSerializer.Meta):
+        fields = ['new_password', 'current_password']
 
 
 class SubscriptionsSerializer(IsSubscribedMixin):

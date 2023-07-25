@@ -5,7 +5,6 @@ from django.db import models
 class User(AbstractUser):
 
     class Meta:
-        db_table = 'User'
         ordering = ['id']
         verbose_name = 'пользователя'
         verbose_name_plural = 'пользователи'
@@ -43,7 +42,7 @@ class User(AbstractUser):
 class Follow(models.Model):
 
     class Meta:
-        db_table = 'Follow'
+        db_table = 'follow'
         ordering = ['user']
         verbose_name = 'подписку'
         verbose_name_plural = 'пользователь -> подписки'
