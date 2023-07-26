@@ -16,7 +16,7 @@ class Ingredients(NameMixinModel):
         help_text='Введите единицу измерения'
     )
     class Meta:
-        db_table = 'Ingredients'
+        db_table = 'ingredients'
         verbose_name = 'ингредиент'
         verbose_name_plural = 'ингредиенты'
 
@@ -29,7 +29,7 @@ class Tags(NameMixinModel):
     )
     slug = models.SlugField(unique=True)
     class Meta:
-        db_table = 'Tags'
+        db_table = 'tags'
         verbose_name = 'тэг'
         verbose_name_plural = 'теги'
 
@@ -68,7 +68,7 @@ class Recipes(NameMixinModel):
         help_text='Введите время приготовления в минутах'
     )
     class Meta:
-        db_table = 'Recipes'
+        db_table = 'recipes'
         ordering = ['id']
         verbose_name = 'рецепт'
         verbose_name_plural = 'рецепты'
@@ -87,7 +87,7 @@ class IngredientsRecipes(RecipesMixinModel):
         help_text='Введите количество'
     )
     class Meta:
-        db_table = 'IngredientsRecipes'
+        db_table = 'ingredientsrecipes'
         ordering = ['recipes']
         verbose_name = 'строки ингредиентов к рецептам'
         verbose_name_plural = 'рецепты -> ингредиенты'
@@ -102,7 +102,7 @@ class TagsRecipes(RecipesMixinModel):
         help_text='Выберите тег'
     )
     class Meta:
-        db_table = 'TagsRecipes'
+        db_table = 'tagsrecipes'
         ordering = ['recipes']
         verbose_name = 'строки тегов к рецептам'
         verbose_name_plural = 'рецепты -> теги'
@@ -110,7 +110,7 @@ class TagsRecipes(RecipesMixinModel):
 
 class Favorite(UserRecipes):
     class Meta:
-        db_table = 'Favorite'
+        db_table = 'favorite'
         ordering = ['user']
         verbose_name = 'избранное'
         verbose_name_plural = 'рецепты -> избранное'
@@ -118,7 +118,7 @@ class Favorite(UserRecipes):
    
 class ShoppingCart(UserRecipes):
     class Meta:
-        db_table = 'ShoppingCart'
+        db_table = 'shoppingcart'
         ordering = ['user']
         verbose_name = 'корзину'
         verbose_name_plural = 'рецепты -> корзина'

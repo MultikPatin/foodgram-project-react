@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import filters
 from rest_framework import status, viewsets
@@ -7,6 +8,9 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import (
     SAFE_METHODS,
     IsAuthenticatedOrReadOnly,
+)
+from rest_framework.pagination import (
+    LimitOffsetPagination
 )
 from .models import (
     Ingredients,
@@ -48,8 +52,21 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
-    queryset = Recipes.objects.all()
     permission_classes = [AuthorOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['author', 'tags']
+    
+    
+    def get_queryset(self):
+        user = self.request.user
+        query_params = self.request.query_params
+        is_favorited = query_params.get('is_favorited')
+        is_in_shopping_cart = query_params.get('is_in_shopping_cart')
+        if is_favorited:
+            return Recipes.objects.filter(favorite__user=user)
+        if is_in_shopping_cart:
+            return Recipes.objects.filter(shoppingcart__user=user)
+        return Recipes.objects.all()
     
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -85,16 +102,14 @@ class ShoppingCartViewSet(UserRecipesViewSet):
 
 @api_view(['GET'])
 def download_shopping_cart(request):
-    user = request.user
     shopping_cart = ShoppingCart.objects.filter(
-        user=user
+        user=request.user
     )
 
     buying_list = {}
     for record in shopping_cart:
-        recipe = record.recipes
         ingredients = IngredientsRecipes.objects.filter(
-            recipes=recipe
+            recipes=record.recipes
         )
         for ingredient in ingredients:
             amount = ingredient.amount
@@ -117,7 +132,6 @@ def download_shopping_cart(request):
         shopping_list.append(
             f'{name} - {amount} {measurement_unit}'
         )
-    print(shopping_list)
     return Response(
             shopping_list,
             status=status.HTTP_201_CREATED

@@ -41,8 +41,8 @@ class GetUserSerializer(IsSubscribedMixin):
 class PasswordSerializer(CoreUserSerializer):
     new_password = serializers.CharField(required=True)
     current_password = serializers.CharField(required=True)
-    class Meta:
-        fields = '__all__'
+    class Meta(CoreUserSerializer.Meta):
+        fields = ['new_password', 'current_password']
 
 
 class SubscriptionsSerializer(IsSubscribedMixin):
@@ -56,18 +56,19 @@ class SubscriptionsSerializer(IsSubscribedMixin):
         ]
 
     def get_recipes_count(self, obj):
-        return obj.recipes.all().count()
+        return Recipes.objects.filter(
+            author=obj
+        ).count()
     
     def get_recipes(self, obj):
         recipes_limit = self.context.get('recipes_limit')
-        following = self.context.get('following')
-        if following:
+        if obj:
             recipes = Recipes.objects.filter(
-                author=following
+                author=obj
             ).values(*RECIPE_FIELDS)
         else:
            recipes = Recipes.objects.all(
-               ).values(*RECIPE_FIELDS)          
+               ).values(*RECIPE_FIELDS)        
         if recipes_limit:
             return recipes[:int(recipes_limit)]
         return recipes

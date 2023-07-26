@@ -83,7 +83,6 @@ class RecipesSafeMethodSerializer(IsFavoriteOrShopingCardMixin):
             many=True
         ).data
 
-
 class RecipesSerializer(IsFavoriteOrShopingCardMixin):
     author = GetUserSerializer(read_only=True)
     ingredients = IngredientsRecipesSerializer(many=True)
@@ -107,7 +106,20 @@ class RecipesSerializer(IsFavoriteOrShopingCardMixin):
 
     def validate_cooking_time(self, data):
         if data <= 0:
-            raise serializers.ValidationError('Введите число больше 0')
+            raise serializers.ValidationError(
+                'Введите число больше 0'
+            )
+        elif data > 1440:
+            raise serializers.ValidationError(
+                'Введите число менее 1440'
+            )
+        return data
+    
+    def validate_ingredients(self, data):
+        if data == []:
+            raise serializers.ValidationError(
+                'Добавьте ингридиенты в рецепт'
+            )
         return data
 
     def create(self, validated_data):
