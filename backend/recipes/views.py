@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import filters
 from rest_framework import status, viewsets
@@ -50,6 +51,13 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
     permission_classes = [AuthorOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = [
+        # 'is_favorited', 
+        # 'is_in_shopping_cart',
+        'author',
+        'tags'
+    ]
     
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:

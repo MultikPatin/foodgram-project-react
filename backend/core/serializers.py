@@ -56,17 +56,19 @@ class IsFavoriteOrShopingCardMixin(CoreRecipeSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     
     def get_is_favorited(self, obj):
-        if self.context['request'].user.is_anonymous:
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
             return False
         return Favorite.objects.filter(
-            user=self.context['request'].user, 
-            recipes=obj.id
+            user=request.user, 
+            recipes=obj
         ).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        if self.context['request'].user.is_anonymous:
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
             return False
         return ShoppingCart.objects.filter(
-            user=self.context['request'].user, 
-            recipes=obj.id
+            user=request.user, 
+            recipes=obj
         ).exists()

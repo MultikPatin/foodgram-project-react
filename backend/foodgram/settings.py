@@ -12,21 +12,6 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='MyTestKey')
 DEBUG = True
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(',')
-ALLOWED_HOSTS = []
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
-    },
-}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -37,7 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework.authtoken',
     'rest_framework',
-    'drf_multiple_model',
+    'django_filters',
     'djoser',
     'core.apps.CoreConfig',
     'api.apps.ApiConfig',
