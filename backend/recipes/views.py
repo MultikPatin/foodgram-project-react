@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import filters
@@ -9,9 +10,9 @@ from rest_framework.permissions import (
     SAFE_METHODS,
     IsAuthenticatedOrReadOnly,
 )
-from rest_framework.pagination import (
-    LimitOffsetPagination
-)
+# from rest_framework.pagination import (
+#     LimitOffsetPagination
+# )
 from .models import (
     Ingredients,
     Tags,
@@ -31,6 +32,7 @@ from .serializers import (
 from core.views import UserRecipesViewSet
 
 from api.permissions import AuthorOrReadOnly
+from api.filters import RecipesFilter
 
 
 User = get_user_model()
@@ -54,7 +56,7 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipesViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorOrReadOnly]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['author', 'tags']
+    filter_class = RecipesFilter
     
     
     def get_queryset(self):
@@ -105,7 +107,6 @@ def download_shopping_cart(request):
     shopping_cart = ShoppingCart.objects.filter(
         user=request.user
     )
-
     buying_list = {}
     for record in shopping_cart:
         ingredients = IngredientsRecipes.objects.filter(
@@ -125,14 +126,18 @@ def download_shopping_cart(request):
                     buying_list[name]['amount'] + amount
                 )
 
-    shopping_list = []
-    for name, data in buying_list.items():
-        amount = data['amount']
-        measurement_unit = data['measurement_unit']
-        shopping_list.append(
-            f'{name} - {amount} {measurement_unit}'
-        )
-    return Response(
-            shopping_list,
-            status=status.HTTP_201_CREATED
-        )
+    with open('/media/shopping_cart.txt', 'w+', encoding='utf8') as card:
+        for name, data in buying_list.items():
+            amount = data['amount']
+            measurement_unit = data['measurement_unit']
+            card.write(
+                f'{name} - {amount} {measurement_unit}\n'
+            )
+
+        response = HttpResponse(
+                card,
+                content_type='text',
+                status=status.HTTP_200_OK
+            )
+        response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
+        return response
