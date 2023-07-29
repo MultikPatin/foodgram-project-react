@@ -9,7 +9,7 @@ from recipes.models import (
     IngredientsRecipes,
     TagsRecipes,
     Favorite,
-    ShoppingCart,   
+    ShoppingCart,
 )
 
 from users.serializers import GetUserSerializer
@@ -24,13 +24,15 @@ from core.serializers import (
 
 
 User = get_user_model()
-        
+
+
 class IngredientSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Ingredients
         fields = '__all__'
         read_only_fields = ['name', 'measurement_unit']
-        
+
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(
@@ -57,31 +59,35 @@ class IngredientsRecipesSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredients.objects.all()
     )
+
     class Meta:
         model = IngredientsRecipes
         fields = ('id', 'amount',)
 
 
-class TagsSerializer(serializers.ModelSerializer):  
+class TagsSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Tags
         fields = '__all__'
         read_only_fields = ['name', 'color', 'slug']
-        
+
 
 class RecipesSafeMethodSerializer(IsFavoriteOrShopingCardMixin):
     author = GetUserSerializer(read_only=True)
     tags = TagsSerializer(many=True)
     ingredients = serializers.SerializerMethodField()
+
     class Meta(CoreRecipeSerializer.Meta):
         fields = '__all__'
-    
+
     def get_ingredients(self, obj):
         ingredients = IngredientsRecipes.objects.filter(recipes=obj)
         return IngredientInRecipeSerializer(
             ingredients,
             many=True
         ).data
+
 
 class RecipesSerializer(IsFavoriteOrShopingCardMixin):
     author = GetUserSerializer(read_only=True)
@@ -92,6 +98,7 @@ class RecipesSerializer(IsFavoriteOrShopingCardMixin):
         slug_field='id'
     )
     cooking_time = serializers.IntegerField()
+
     class Meta(CoreRecipeSerializer.Meta):
         fields = [
             'id',
@@ -114,7 +121,7 @@ class RecipesSerializer(IsFavoriteOrShopingCardMixin):
                 'Введите число менее 1440'
             )
         return data
-    
+
     def validate_ingredients(self, data):
         if data == []:
             raise serializers.ValidationError(

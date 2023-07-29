@@ -11,12 +11,13 @@ from recipes.models import Recipes
 
 User = get_user_model()
 
+
 class UserRecipesViewSet(APIView):
     queryset = None
     serializer = None
     message = ''
     message_plural = ''
-    
+
     @action(
         methods=['post'],
         detail=True,

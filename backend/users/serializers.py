@@ -41,6 +41,7 @@ class GetUserSerializer(IsSubscribedMixin):
 class PasswordSerializer(CoreUserSerializer):
     new_password = serializers.CharField(required=True)
     current_password = serializers.CharField(required=True)
+
     class Meta(CoreUserSerializer.Meta):
         fields = ['new_password', 'current_password']
 
@@ -48,7 +49,8 @@ class PasswordSerializer(CoreUserSerializer):
 class SubscriptionsSerializer(IsSubscribedMixin):
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    class Meta(CoreUserSerializer.Meta): 
+
+    class Meta(CoreUserSerializer.Meta):
         fields = USER_FIELDS + [
             'is_subscribed',
             'recipes',
@@ -59,7 +61,7 @@ class SubscriptionsSerializer(IsSubscribedMixin):
         return Recipes.objects.filter(
             author=obj
         ).count()
-    
+
     def get_recipes(self, obj):
         recipes_limit = self.context.get('recipes_limit')
         if obj:
@@ -67,11 +69,12 @@ class SubscriptionsSerializer(IsSubscribedMixin):
                 author=obj
             ).values(*RECIPE_FIELDS)
         else:
-           recipes = Recipes.objects.all(
-               ).values(*RECIPE_FIELDS)        
+            recipes = Recipes.objects.all(
+               ).values(*RECIPE_FIELDS)
         if recipes_limit:
             return recipes[:int(recipes_limit)]
         return recipes
+
 
 class FollowerSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
@@ -80,6 +83,7 @@ class FollowerSerializer(serializers.ModelSerializer):
     following = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all()
     )
+
     class Meta:
         model = Follow
         fields = ('user', 'following')
@@ -89,7 +93,7 @@ class FollowerSerializer(serializers.ModelSerializer):
                 fields=['user', 'following'],
             )
         ]
-    
+
     def validate(self, data):
         user = data.get('user')
         following = data.get('following')
@@ -97,4 +101,4 @@ class FollowerSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'На себя подписаться нельзя'
             )
-        return data   
+        return data

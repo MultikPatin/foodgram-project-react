@@ -36,7 +36,7 @@ class IngredientsAdmin(admin.ModelAdmin):
         'name',
         'measurement_unit',
     )
-    list_editable = ('name','measurement_unit',)
+    list_editable = ('name', 'measurement_unit',)
     search_fields = ('name',)
     list_filter = ('measurement_unit',)
     empty_value_display = '-пусто-'
@@ -50,7 +50,7 @@ class TagssAdmin(admin.ModelAdmin):
         'color',
         'slug',
     )
-    list_editable = ('name','color',)
+    list_editable = ('name', 'color',)
     search_fields = ('name',)
     list_filter = ('color',)
     empty_value_display = '-пусто-'
@@ -94,6 +94,7 @@ class ListAdmin(admin.ModelAdmin):
     )
     search_fields = ('user',)
     empty_value_display = '-пусто-'
+
 
 @admin.register(Favorite)
 class FavoriteAdmin(ListAdmin):

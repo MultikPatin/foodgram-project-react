@@ -27,16 +27,17 @@ from .models import Follow
 
 User = get_user_model()
 
+
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     pagination_class = LimitOffsetPagination
-    
+
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return GetUserSerializer
         return PostUserSerializer
-    
+
     def perform_create(self, serializer):
         if 'password' in self.request.data:
             password = make_password(self.request.data['password'])
@@ -108,7 +109,6 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         )
         return paginator.get_paginated_response(serializer.data)
 
-
     @action(
         methods=['delete', 'post'],
         detail=True,
@@ -118,7 +118,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         recipes_limit = request.query_params.get('recipes_limit')
         following = get_object_or_404(User, pk=pk)
         follow = Follow.objects.filter(
-            user=request.user, 
+            user=request.user,
             following=get_object_or_404(User, pk=pk)
         )
         data = {
@@ -147,7 +147,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return Response(
                 result_page.data,
                 status=status.HTTP_201_CREATED
-            )  
+            )
         elif request.method == 'DELETE':
             follow.delete()
             return Response(

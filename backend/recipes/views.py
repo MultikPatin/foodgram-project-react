@@ -16,7 +16,7 @@ from .models import (
     Recipes,
     Favorite,
     ShoppingCart,
-    IngredientsRecipes,  
+    IngredientsRecipes,
 )
 from .serializers import (
     IngredientSerializer,
@@ -36,6 +36,7 @@ from api.filters import (
 
 
 User = get_user_model()
+
 
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredients.objects.all()
@@ -58,8 +59,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_class = RecipesFilter
-    
-    
+
     def get_queryset(self):
         user = self.request.user
         queryset = Recipes.objects.all()
@@ -71,17 +71,17 @@ class RecipesViewSet(viewsets.ModelViewSet):
         if is_in_shopping_cart:
             return queryset.filter(shoppingcart__user=user)
         return queryset.all()
-    
+
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return RecipesSafeMethodSerializer
         return RecipesSerializer
-    
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({'request': self.request})
         return context
-    
+
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
         return Response(
@@ -141,5 +141,6 @@ def download_shopping_cart(request):
                 content_type='text',
                 status=status.HTTP_200_OK
             )
-        response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping_cart.txt"')
         return response
