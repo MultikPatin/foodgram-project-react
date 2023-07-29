@@ -137,10 +137,10 @@ def download_shopping_cart(request):
             )
 
         response = HttpResponse(
-                card,
-                content_type='text',
-                status=status.HTTP_200_OK
-            )
+            card,
+            content_type='text',
+            status=status.HTTP_200_OK
+        )
         response['Content-Disposition'] = (
             'attachment; filename="shopping_cart.txt"')
         return response
