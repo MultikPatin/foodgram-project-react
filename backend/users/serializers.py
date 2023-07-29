@@ -67,10 +67,10 @@ class SubscriptionsSerializer(IsSubscribedMixin):
         if obj:
             recipes = Recipes.objects.filter(
                 author=obj
-            ).values(*RECIPE_FIELDS)
+                ).values(*RECIPE_FIELDS)
         else:
             recipes = Recipes.objects.all(
-               ).values(*RECIPE_FIELDS)
+                ).values(*RECIPE_FIELDS)
         if recipes_limit:
             return recipes[:int(recipes_limit)]
         return recipes
