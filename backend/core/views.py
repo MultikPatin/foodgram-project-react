@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
+from recipes.models import Recipes
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from recipes.models import Recipes
 
 
 User = get_user_model()
@@ -39,14 +39,12 @@ class UserRecipesViewSet(APIView):
         serializer = self.serializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return_page = Recipes.objects.filter(
-           pk=recipe_id
-           ).values(
-               'id',
-               'name',
-               'image',
-               'cooking_time',
-               ).first()
+        return_page = Recipes.objects.filter(pk=recipe_id).values(
+            'id',
+            'name',
+            'image',
+            'cooking_time',
+        ).first()
         return Response(
             return_page,
             status=status.HTTP_201_CREATED
