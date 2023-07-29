@@ -3,12 +3,13 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from users.models import Follow
-
 from core.serializers import (
     CoreUserSerializer,
     IsSubscribedMixin,
 )
+
+from users.models import Follow
+
 from recipes.models import Recipes
 
 User = get_user_model()
@@ -67,10 +68,11 @@ class SubscriptionsSerializer(IsSubscribedMixin):
         if obj:
             recipes = Recipes.objects.filter(
                 author=obj
-                ).values(*RECIPE_FIELDS)
+            ).values(*RECIPE_FIELDS)
         else:
-            recipes = Recipes.objects.all(
-                ).values(*RECIPE_FIELDS)
+            recipes = Recipes.objects.all().values(
+                *RECIPE_FIELDS
+            )
         if recipes_limit:
             return recipes[:int(recipes_limit)]
         return recipes
