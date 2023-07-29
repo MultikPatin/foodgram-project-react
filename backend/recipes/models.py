@@ -9,12 +9,14 @@ from core.models import (
 
 User = get_user_model()
 
+
 class Ingredients(NameMixinModel):
     measurement_unit = models.CharField(
         'Единица измерения',
         max_length=10,
         help_text='Введите единицу измерения'
     )
+
     class Meta:
         db_table = 'ingredients'
         verbose_name = 'ингредиент'
@@ -28,6 +30,7 @@ class Tags(NameMixinModel):
         help_text='Введите цвет'
     )
     slug = models.SlugField(unique=True)
+
     class Meta:
         db_table = 'tags'
         verbose_name = 'тэг'
@@ -67,6 +70,7 @@ class Recipes(NameMixinModel):
         verbose_name='время приготовления',
         help_text='Введите время приготовления в минутах'
     )
+
     class Meta:
         db_table = 'recipes'
         ordering = ['id']
@@ -86,6 +90,7 @@ class IngredientsRecipes(RecipesMixinModel):
         verbose_name='количество',
         help_text='Введите количество'
     )
+
     class Meta:
         db_table = 'ingredientsrecipes'
         ordering = ['recipes']
@@ -101,6 +106,7 @@ class TagsRecipes(RecipesMixinModel):
         verbose_name='тег',
         help_text='Выберите тег'
     )
+
     class Meta:
         db_table = 'tagsrecipes'
         ordering = ['recipes']
@@ -109,14 +115,16 @@ class TagsRecipes(RecipesMixinModel):
 
 
 class Favorite(UserRecipes):
+
     class Meta:
         db_table = 'favorite'
         ordering = ['user']
         verbose_name = 'избранное'
         verbose_name_plural = 'рецепты -> избранное'
 
-   
+
 class ShoppingCart(UserRecipes):
+
     class Meta:
         db_table = 'shoppingcart'
         ordering = ['user']

@@ -6,6 +6,7 @@ from .models import Follow
 
 User = get_user_model()
 
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
@@ -33,5 +34,3 @@ class FollowAdmin(admin.ModelAdmin):
     )
     search_fields = ('user',)
     empty_value_display = '-пусто-'
-
-

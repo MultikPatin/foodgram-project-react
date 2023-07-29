@@ -6,10 +6,10 @@ from rest_framework.permissions import (
 
 class AuthorOrReadOnly(BasePermission):
     """Разрешение на уровне создатель"""
-    
+
     def has_permission(self, request, view):
         return (
-            request.method in SAFE_METHODS 
+            request.method in SAFE_METHODS
             or request.user.is_authenticated
         )
 

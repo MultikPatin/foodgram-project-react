@@ -3,7 +3,6 @@ import django_filters as filters
 from recipes.models import Recipes, Tags, Ingredients
 
 
-
 class RecipesFilter(filters.FilterSet):
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
@@ -16,12 +15,12 @@ class RecipesFilter(filters.FilterSet):
         fields = ['author', 'tags']
 
 
-
 class IngredientsFilter(filters.FilterSet):
     name = filters.CharFilter(
         field_name='name',
         lookup_expr='startswith'
     )
+
     class Meta:
         model = Ingredients
         fields = ['name']
