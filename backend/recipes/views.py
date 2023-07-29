@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
+
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework import filters
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -10,9 +10,6 @@ from rest_framework.permissions import (
     SAFE_METHODS,
     IsAuthenticatedOrReadOnly,
 )
-# from rest_framework.pagination import (
-#     LimitOffsetPagination
-# )
 from .models import (
     Ingredients,
     Tags,
@@ -32,7 +29,10 @@ from .serializers import (
 from core.views import UserRecipesViewSet
 
 from api.permissions import AuthorOrReadOnly
-from api.filters import RecipesFilter
+from api.filters import (
+    RecipesFilter,
+    IngredientsFilter
+)
 
 
 User = get_user_model()
@@ -42,8 +42,9 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = None
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['^name']
+    filter_backends = [DjangoFilterBackend]
+    filter_class = IngredientsFilter
+    search_fields = ['name']
 
 
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -61,14 +62,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
+        queryset = Recipes.objects.all()
         query_params = self.request.query_params
         is_favorited = query_params.get('is_favorited')
         is_in_shopping_cart = query_params.get('is_in_shopping_cart')
         if is_favorited:
-            return Recipes.objects.filter(favorite__user=user)
+            return queryset.filter(favorite__user=user)
         if is_in_shopping_cart:
-            return Recipes.objects.filter(shoppingcart__user=user)
-        return Recipes.objects.all()
+            return queryset.filter(shoppingcart__user=user)
+        return queryset.all()
     
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
