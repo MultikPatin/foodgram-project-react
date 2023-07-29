@@ -41,12 +41,12 @@ class UserRecipesViewSet(APIView):
         serializer.save()
         return_page = Recipes.objects.filter(
            pk=recipe_id
-        ).values(
-            'id',
-            'name',
-            'image',
-            'cooking_time',
-        ).first()
+           ).values(
+               'id',
+               'name',
+               'image',
+               'cooking_time',
+               ).first()
         return Response(
             return_page,
             status=status.HTTP_201_CREATED
