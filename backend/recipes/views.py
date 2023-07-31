@@ -44,8 +44,7 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = None
     filter_backends = [DjangoFilterBackend]
-    filter_class = IngredientsFilter
-    search_fields = ['name']
+    filterset_class = IngredientsFilter
 
 
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -56,21 +55,10 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
+    queryset = Recipes.objects.all()
     permission_classes = [AuthorOrReadOnly]
     filter_backends = [DjangoFilterBackend]
-    filter_class = RecipesFilter
-
-    def get_queryset(self):
-        user = self.request.user
-        queryset = Recipes.objects.all()
-        query_params = self.request.query_params
-        is_favorited = query_params.get('is_favorited')
-        is_in_shopping_cart = query_params.get('is_in_shopping_cart')
-        if is_favorited:
-            return queryset.filter(favorite__user=user)
-        if is_in_shopping_cart:
-            return queryset.filter(shoppingcart__user=user)
-        return queryset.all()
+    filterset_class = RecipesFilter
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:

@@ -43,7 +43,7 @@ class UserRecipesSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ['user', 'recipes']
 
 
 class CoreRecipeSerializer(serializers.ModelSerializer):
