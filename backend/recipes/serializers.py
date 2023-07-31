@@ -27,10 +27,13 @@ User = get_user_model()
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Ingredients
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'measurement_unit',
+        ]
         read_only_fields = ['name', 'measurement_unit']
 
 
@@ -45,7 +48,7 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
         source='ingredients.measurement_unit',
     )
 
-    class Meta:
+    class Meta():
         model = IngredientsRecipes
         fields = (
             'id',
@@ -62,14 +65,19 @@ class IngredientsRecipesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientsRecipes
-        fields = ('id', 'amount',)
+        fields = ['id', 'amount']
 
 
 class TagsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tags
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'color',
+            'slug'
+        ]
         read_only_fields = ['name', 'color', 'slug']
 
 
@@ -79,7 +87,17 @@ class RecipesSafeMethodSerializer(IsFavoriteOrShopingCardMixin):
     ingredients = serializers.SerializerMethodField()
 
     class Meta(CoreRecipeSerializer.Meta):
-        fields = '__all__'
+        fields = [
+            'id',
+            'author',
+            'ingredients',
+            'tags',
+            'image',
+            'text',
+            'cooking_time',
+            'is_favorited',
+            'is_in_shopping_cart',
+        ]
 
     def get_ingredients(self, obj):
         ingredients = IngredientsRecipes.objects.filter(recipes=obj)
@@ -109,6 +127,8 @@ class RecipesSerializer(IsFavoriteOrShopingCardMixin):
             'image',
             'text',
             'cooking_time',
+            'is_favorited',
+            'is_in_shopping_cart',
         ]
 
     def validate_cooking_time(self, data):
@@ -137,39 +157,47 @@ class RecipesSerializer(IsFavoriteOrShopingCardMixin):
             author=author,
             **validated_data
         )
+        list_to_create = []
         for ingredient in ingredients:
             ingredient_id = ingredient['id']
             amount = ingredient['amount']
-            IngredientsRecipes.objects.create(
-                ingredients=ingredient_id,
-                recipes=recipe,
-                amount=amount
+            list_to_create.append(
+                IngredientsRecipes(
+                    ingredients=ingredient_id,
+                    recipes=recipe,
+                    amount=amount
+                )
             )
+        IngredientsRecipes.objects.bulk_create(list_to_create)
         recipe.tags.set(tags)
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients_data = validated_data.pop("ingredients")
-        tags_data = validated_data.pop("tags")
+        ingredients_data = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
         TagsRecipes.objects.filter(
             recipes=instance
         ).delete()
         IngredientsRecipes.objects.filter(
             recipes=instance
         ).delete()
+        list_to_create = []
         for ingredient in ingredients_data:
-            ingredient_id = ingredient["id"]
-            amount = ingredient["amount"]
-            IngredientsRecipes.objects.create(
-                ingredients=ingredient_id,
-                recipes=instance,
-                amount=amount
+            ingredient_id = ingredient['id']
+            amount = ingredient['amount']
+            list_to_create.append(
+                IngredientsRecipes(
+                    ingredients=ingredient_id,
+                    recipes=instance,
+                    amount=amount
+                )
             )
-        instance.name = validated_data.pop("name")
-        instance.text = validated_data.pop("text")
-        if validated_data.get("image") is not None:
-            instance.image = validated_data.pop("image")
-        instance.cooking_time = validated_data.pop("cooking_time")
+        IngredientsRecipes.objects.bulk_create(list_to_create)
+        instance.name = validated_data.pop('name')
+        instance.text = validated_data.pop('text')
+        if validated_data.get('image') is not None:
+            instance.image = validated_data.pop('image')
+        instance.cooking_time = validated_data.pop('cooking_time')
         instance.tags.set(tags_data)
         instance.save()
         return instance
