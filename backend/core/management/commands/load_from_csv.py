@@ -31,21 +31,14 @@ class LoadCSVData(BaseCommand):
             with open(self.file_path,
                       mode='r',
                       encoding='utf-8-sig') as csv_file:
-                count = 1
                 models = []
                 for row in DictReader(csv_file):
-                    data = []
-                    data.append(str(count))
-                    for field in self.fields:
-                        try:
-                            data.append(row[field])
-                        except KeyError as mes:
-                            self.logger.warning(mes)
-                    models.append(self.model(*data))
-                    count += 1
+                    try:
+                        data = {field: row[field] for field in self.fields}
+                    except KeyError as mes:
+                        self.logger.warning(mes)
+                    models.append(self.model(**data))
                 self.model.objects.bulk_create(models)
-
             self.logger.debug(f'Saved {model_name} data')
-
         except Exception as e:
             self.logger.warning(e)
