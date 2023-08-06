@@ -14,25 +14,26 @@ services:
     image: patinda/foodgram_backend
     env_file: .env
     volumes:
-      - static:/app/static/
+      - static_backend:/app/static/
       - media:/app/media/
 
   frontend:
     image: patinda/foodgram_frontend
     env_file: .env
     volumes:
-      - ./frontend/:/app/result_build/
+      - static_frontend:/app/result_build/build
 
   gateway:
     image: patinda/foodgram_gateway
     ports:
       - '8000:80'
     volumes:
-      - ./frontend/build:/usr/share/nginx/html/
-      - static:/var/html/static/
+      - static_frontend:/usr/share/nginx/html/
+      - static_backend:/var/html/static/
       - media:/var/html/media/
 
 volumes:
   pg_data:
-  static:
+  static_backend:
+  static_frontend:
   media:

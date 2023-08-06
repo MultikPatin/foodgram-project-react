@@ -1,7 +1,7 @@
 #!/bin/bash
 python manage.py migrate
 
-python manage.py collectstatic
+python manage.py collectstatic --clear --noinput
 
 python manage.py load_from_csv_ingredients
 
