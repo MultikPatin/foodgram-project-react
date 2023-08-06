@@ -29,8 +29,8 @@ services:
       - '8000:80'
     volumes:
       - static_frontend:/usr/share/nginx/html/
-      - static_backend:/var/html/static/
-      - media:/var/html/media/
+      - static_backend:/app/var/html/static/
+      - media:/app/var/html/media/
 
 volumes:
   pg_data:
