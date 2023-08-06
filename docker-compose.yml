@@ -15,26 +15,26 @@ services:
     build: ./backend/
     env_file: .env
     volumes:
-      - static:/app/static/
+      - static:/backend_static
       - media:/app/media/
 
   frontend:
     container_name: frontend
     build:
       context: ./frontend
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - ./frontend/:/app/result_build/
-  nginx:
-    container_name: nginx
-    image: nginx:1.19.3
+      - static:/frontend_static
+  gateway:
+    container_name: gateway
+    build: ./nginx/
+    env_file: .env
     ports:
-      - '8000:80'
+      - 8000:80
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./frontend/build:/usr/share/nginx/html/
-      - ./docs/:/usr/share/nginx/html/api/docs/
-      - static:/var/html/static/
-      - media:/var/html/media/
+      - static:/staticfiles/
+      - media:/media/
 
 volumes:
   pg_data:
