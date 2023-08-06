@@ -124,11 +124,12 @@ def download_shopping_cart(request):
                 f'{name} - {amount} {measurement_unit}\n'
             )
 
-        response = HttpResponse(
-            card,
-            content_type='text',
-            status=status.HTTP_200_OK
-        )
-        response['Content-Disposition'] = (
-            'attachment; filename="shopping_cart.txt"')
-        return response
+    data = open('/media/shopping_cart.txt', 'r').read()
+    response = HttpResponse(
+        data,
+        content_type='text/plain',
+        status=status.HTTP_200_OK
+    )
+    response['Content-Disposition'] = (
+        'attachment; filename="shopping_cart.txt"')
+    return response
