@@ -25,7 +25,7 @@ services:
 
   gateway:
     image: nginx:1.19.3
-    command: cp -r ./infra/nginx.conf /etc/nginx/conf.d/default.conf
+    command: cp -r ./infra/nginx.conf /etc/nginx/templates/default.conf.template
     ports:
       - '8000:80'
     volumes:
