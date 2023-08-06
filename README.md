@@ -1,3 +1,9 @@
+IP 158.160.69.4
+Domen <https://miltyfoodgram.ddns.net>
+
+Admin
+Login root
+Password root
 # Диломный проект Foodgram
 
 Проект 'Продуктовый помощник' реализует сайт кулинарных рецептов,
