@@ -14,7 +14,7 @@ services:
     image: patinda/foodgram_backend
     env_file: .env
     volumes:
-      - static:/app/static/
+      - static_backend:/app/static/
       - media:/app/media/
 
   frontend:
@@ -35,5 +35,5 @@ services:
 
 volumes:
   pg_data:
-  static:
+  static_backend:
   media:
