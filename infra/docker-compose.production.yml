@@ -1,14 +1,15 @@
-
 version: '3.3'
 services:
 
   db:
+    container_name: foodgram-db
     image: postgres:13.10
     env_file: ../.env
     volumes:
       - pg_data:/var/lib/postgresql/data
 
   backend:
+    container_name: foodgram-backend
     depends_on:
       - db
     image: patinda/foodgram_backend
@@ -18,12 +19,14 @@ services:
       - media:/app/media/
 
   frontend:
+    container_name: foodgram-frontend
     image: patinda/foodgram_frontend
     env_file: ../.env
     volumes:
       - ../frontend/:/app/result_build/
 
   gateway:
+    container_name: foodgram-gateway
     image: nginx:1.19.3
     ports:
       - '8000:80'
