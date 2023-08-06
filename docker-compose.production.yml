@@ -30,7 +30,7 @@ services:
       - '8000:80'
     volumes:
       - ./frontend/build:/usr/share/nginx/html/
-      - static:/var/html/static/
+      - static_backend:/var/html/static/
       - media:/var/html/media/
 
 volumes:
