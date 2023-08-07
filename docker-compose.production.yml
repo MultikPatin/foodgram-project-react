@@ -31,7 +31,6 @@ services:
       - static:/staticfiles/
       - media:/media/
 
-
 volumes:
   pg_data:
   static:
