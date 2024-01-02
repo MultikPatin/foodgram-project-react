@@ -1,34 +1,48 @@
-IP 158.160.69.4
-Domen <https://miltyfoodgram.ddns.net>
+![repo size](https://img.shields.io/github/repo-size/foxygen-d/cat_charity_fund)
+![py version](https://img.shields.io/pypi/pyversions/3)
 
-Admin
-Login root
-Password root
-# Диломный проект Foodgram
+[![Python](https://img.shields.io/badge/-Python-464646?style=flat&logo=Python&logoColor=56C0C0&color=008080)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/-Django-464646?style=flat&logo=Django&logoColor=56C0C0&color=008080)](https://www.djangoproject.com/)
+[![Django REST Framework](https://img.shields.io/badge/-Django%20REST%20Framework-464646?style=flat&logo=Django%20REST%20Framework&logoColor=56C0C0&color=008080)](https://www.django-rest-framework.org/)
+[![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-464646?style=flat&logo=PostgreSQL&logoColor=56C0C0&color=008080)](https://www.postgresql.org/)
+[![Nginx](https://img.shields.io/badge/-NGINX-464646?style=flat&logo=NGINX&logoColor=56C0C0&color=008080)](https://nginx.org/ru/)
+[![gunicorn](https://img.shields.io/badge/-gunicorn-464646?style=flat&logo=gunicorn&logoColor=56C0C0&color=008080)](https://gunicorn.org/)
+[![Docker](https://img.shields.io/badge/-Docker-464646?style=flat&logo=Docker&logoColor=56C0C0&color=008080)](https://www.docker.com/)
+[![GitHub%20Actions](https://img.shields.io/badge/-GitHub%20Actions-464646?style=flat&logo=GitHub%20actions&logoColor=56C0C0&color=008080)](https://github.com/features/actions)
 
-Проект 'Продуктовый помощник' реализует сайт кулинарных рецептов,
+# Продуктовый помощник
+
+![alt text](https://pictures.s3.yandex.net/resources/S16_01_1692340098.png)
+
+### Описание проекта
+
+Проект реализует сайт кулинарных рецептов,
 в котором вы можете создавать рецепты, подписываться на понравившихся
 авторов, подобрать себе коллекцию любимых рецептов и другой функционал.
 
-## Проект запускается в 4 контейнерах
+
+
+## Запуск проекта
+
+
+### Проект запускается в 4 контейнерах
 
     nginx
     backend
     frontend
     db
 
-## Авторизация по токену
+### Авторизация по токену
 
 Все запросы от имени пользователя должны выполняться с заголовком
 
     "Authorization: Token TOKENVALUE"
 
-## Необходимые инструменты для запуска
+### Необходимые инструменты для запуска
 
     docker
-    docker-compose
 
-## Запуск приложения
+### Запуск приложения
 
 Перед запуском необходимо создать файл .env с переменными в
 корневом каталоге
@@ -42,16 +56,16 @@ Password root
     ALLOWED_HOSTS
     DEBUG
 
-## Запуск контейнеров
+### Запуск контейнеров
 
-перейти в католог /infra/ и выполнить
+Перейти в каталог /infra/ и выполнить
 
 ```bash
 docker-compose up -d --build
 ```
 
-При запуске контейнеров БД создаётся атоматически и так же теги и
-ингрилиенты автоматически заполняются данныйми из файлов:
+При запуске контейнеров БД создаётся автоматически и так же теги и
+ингредиенты автоматически заполняются данными из файлов:
 
     /backend/test_data/ingredients.csv
     /backend/test_data/tags.csv
@@ -69,7 +83,7 @@ docker-compose up -d --build
     nginx 1.19.3
     djoser 2.2.0
 
-### Доступные эндпоинты
+## Доступные эндпоинты
 
 #### docs
 
